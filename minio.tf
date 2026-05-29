@@ -5,28 +5,27 @@ locals {
 
 resource "helm_release" "minio" {
   name       = "minio"
-  repository = "oci://registry-1.docker.io/bitnamicharts"
+  repository = "https://charts.min.io/"
   chart      = "minio"
   namespace  = local.namespace
 
   values = [
     <<-EOF
-    image:
-      tag: "${var.MINIO_VERSION}"
-    commonAnnotations:
-      ${replace(local.minio_annotations, "/\n/", "\n  ")}
-    commonLabels:
-      ${replace(local.minio_labels, "/\n/", "\n  ")}
     fullnameOverride: "${local.minio_service_name}"
-    mode: "distributed" # Use replicas
-    auth:
-      rootUser: "admin" # default of the Helm chart, lock it for the future
-      rootPassword: "${random_password.minio_admin_password.result}"
-    metrics:
-      enabled: true
+    mode: "standalone"
+    rootUser: "admin"
+    rootPassword: "${random_password.minio_admin_password.result}"
     persistence:
-      mountPath: "/bitnami/minio/data" # default of the Helm chart, locked to keep it like that in the future
-    extraEnvVarsCM: "${local.minio_env_vars_configmap}"
+      enabled: true
+    resources:
+      requests:
+        memory: "512Mi"
+        cpu: "100m"
+      limits:
+        memory: "1Gi"
+        cpu: "1000m"
+    podAnnotations:
+      ${replace(local.minio_annotations, "/\n/", "\n  ")}
     EOF
   ]
 }

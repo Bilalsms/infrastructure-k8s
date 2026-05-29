@@ -7,10 +7,9 @@ resource "helm_release" "misarch_address_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.address_db_service_name}"
-    image:
-      tag: "${var.POSTGRES_VERSION}"
     auth:
-      enablePostgresUser: false
+      enablePostgresUser: true
+      postgresPassword: "${random_password.postgres_address_db_password.result}"
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_address_db_password.result}"
@@ -29,10 +28,9 @@ resource "helm_release" "misarch_catalog_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.catalog_db_service_name}"
-    image:
-      tag: "${var.POSTGRES_VERSION}"
     auth:
-      enablePostgresUser: false
+      enablePostgresUser: true
+      postgresPassword: "${random_password.postgres_catalog_db_password.result}"
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_catalog_db_password.result}"
@@ -50,10 +48,9 @@ resource "helm_release" "misarch_discount_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.discount_db_service_name}"
-    image:
-      tag: "${var.POSTGRES_VERSION}"
     auth:
-      enablePostgresUser: false
+      enablePostgresUser: true
+      postgresPassword: "${random_password.postgres_discount_db_password.result}"
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_discount_db_password.result}"
@@ -72,10 +69,9 @@ resource "helm_release" "misarch_notification_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.notification_db_service_name}"
-    image:
-      tag: "${var.POSTGRES_VERSION}"
     auth:
-      enablePostgresUser: false
+      enablePostgresUser: true
+      postgresPassword: "${random_password.postgres_notification_db_password.result}"
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_notification_db_password.result}"
@@ -94,10 +90,9 @@ resource "helm_release" "misarch_return_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.return_db_service_name}"
-    image:
-      tag: "${var.POSTGRES_VERSION}"
     auth:
-      enablePostgresUser: false
+      enablePostgresUser: true
+      postgresPassword: "${random_password.postgres_return_db_password.result}"
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_return_db_password.result}"
@@ -116,10 +111,9 @@ resource "helm_release" "misarch_shipment_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.shipment_db_service_name}"
-    image:
-      tag: "${var.POSTGRES_VERSION}"
     auth:
-      enablePostgresUser: false
+      enablePostgresUser: true
+      postgresPassword: "${random_password.postgres_shipment_db_password.result}"
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_shipment_db_password.result}"
@@ -138,10 +132,9 @@ resource "helm_release" "misarch_tax_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.tax_db_service_name}"
-    image:
-      tag: "${var.POSTGRES_VERSION}"
     auth:
-      enablePostgresUser: false
+      enablePostgresUser: true
+      postgresPassword: "${random_password.postgres_tax_db_password.result}"
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_tax_db_password.result}"
@@ -160,10 +153,9 @@ resource "helm_release" "misarch_user_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.user_db_service_name}"
-    image:
-      tag: "${var.POSTGRES_VERSION}"
     auth:
-      enablePostgresUser: false
+      enablePostgresUser: true
+      postgresPassword: "${random_password.postgres_user_db_password.result}"
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_user_db_password.result}"
@@ -182,10 +174,9 @@ resource "helm_release" "misarch_keycloak_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.keycloak_db_service_name}"
-    image:
-      tag: "${var.POSTGRES_VERSION}"
     auth:
-      enablePostgresUser: false
+      enablePostgresUser: true
+      postgresPassword: "${random_password.postgres_keycloak_db_password.result}"
       username: ${var.KEYCLOAK_DB_USER}
       database: ${var.KEYCLOAK_DB_DATABASE}
       password: "${random_password.keycloak_db_password.result}"

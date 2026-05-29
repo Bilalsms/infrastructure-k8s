@@ -26,9 +26,7 @@ resource "helm_release" "misarch_inventory_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.inventory_db_service_name}"
-    architecture: "replicaset"
-    image:
-      tag: "${var.MONGODB_VERSION}"
+    architecture: "standalone"
     auth:
       enabled: false
     metrics:
@@ -62,9 +60,7 @@ resource "helm_release" "misarch_invoice_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.invoice_db_service_name}"
-    architecture: "replicaset"
-    image:
-      tag: "${var.MONGODB_VERSION}"
+    architecture: "standalone"
     auth:
       enabled: false
     metrics:
@@ -98,9 +94,7 @@ resource "helm_release" "misarch_media_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.media_db_service_name}"
-    architecture: "replicaset"
-    image:
-      tag: "${var.MONGODB_VERSION}"
+    architecture: "standalone"
     auth:
       enabled: false
     metrics:
@@ -134,9 +128,7 @@ resource "helm_release" "misarch_order_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.order_db_service_name}"
-    architecture: "replicaset"
-    image:
-      tag: "${var.MONGODB_VERSION}"
+    architecture: "standalone"
     auth:
       enabled: false
     metrics:
@@ -170,9 +162,7 @@ resource "helm_release" "misarch_payment_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.payment_db_service_name}"
-    architecture: "replicaset"
-    image:
-      tag: "${var.MONGODB_VERSION}"
+    architecture: "standalone"
     auth:
       enabled: false
     metrics:
@@ -206,9 +196,7 @@ resource "helm_release" "misarch_review_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.review_db_service_name}"
-    architecture: "replicaset"
-    image:
-      tag: "${var.MONGODB_VERSION}"
+    architecture: "standalone"
     auth:
       enabled: false
     metrics:
@@ -242,9 +230,7 @@ resource "helm_release" "misarch_shoppingcart_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.shoppingcart_db_service_name}"
-    architecture: "replicaset"
-    image:
-      tag: "${var.MONGODB_VERSION}"
+    architecture: "standalone"
     auth:
       enabled: false
     metrics:
@@ -278,9 +264,7 @@ resource "helm_release" "misarch_wishlist_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.wishlist_db_service_name}"
-    architecture: "replicaset"
-    image:
-      tag: "${var.MONGODB_VERSION}"
+    architecture: "standalone"
     auth:
       enabled: false
     metrics:

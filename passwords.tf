@@ -89,6 +89,51 @@ resource "random_password" "misarch_wishlist_db_password" {
   special = false
 }
 
+resource "random_password" "postgres_address_db_password" {
+  length  = 32
+  special = false
+}
+
+resource "random_password" "postgres_catalog_db_password" {
+  length  = 32
+  special = false
+}
+
+resource "random_password" "postgres_discount_db_password" {
+  length  = 32
+  special = false
+}
+
+resource "random_password" "postgres_notification_db_password" {
+  length  = 32
+  special = false
+}
+
+resource "random_password" "postgres_return_db_password" {
+  length  = 32
+  special = false
+}
+
+resource "random_password" "postgres_shipment_db_password" {
+  length  = 32
+  special = false
+}
+
+resource "random_password" "postgres_tax_db_password" {
+  length  = 32
+  special = false
+}
+
+resource "random_password" "postgres_user_db_password" {
+  length  = 32
+  special = false
+}
+
+resource "random_password" "postgres_keycloak_db_password" {
+  length  = 32
+  special = false
+}
+
 resource "random_password" "rabbitmq_password" {
   length  = 32
   special = false
@@ -194,6 +239,51 @@ output "misarch_user_db_password" {
 
 output "misarch_wishlist_db_password" {
   value     = random_password.misarch_wishlist_db_password.result
+  sensitive = true
+}
+
+output "postgres_address_db_password" {
+  value     = random_password.postgres_address_db_password.result
+  sensitive = true
+}
+
+output "postgres_catalog_db_password" {
+  value     = random_password.postgres_catalog_db_password.result
+  sensitive = true
+}
+
+output "postgres_discount_db_password" {
+  value     = random_password.postgres_discount_db_password.result
+  sensitive = true
+}
+
+output "postgres_notification_db_password" {
+  value     = random_password.postgres_notification_db_password.result
+  sensitive = true
+}
+
+output "postgres_return_db_password" {
+  value     = random_password.postgres_return_db_password.result
+  sensitive = true
+}
+
+output "postgres_shipment_db_password" {
+  value     = random_password.postgres_shipment_db_password.result
+  sensitive = true
+}
+
+output "postgres_tax_db_password" {
+  value     = random_password.postgres_tax_db_password.result
+  sensitive = true
+}
+
+output "postgres_user_db_password" {
+  value     = random_password.postgres_user_db_password.result
+  sensitive = true
+}
+
+output "postgres_keycloak_db_password" {
+  value     = random_password.postgres_keycloak_db_password.result
   sensitive = true
 }
 
