@@ -9,7 +9,7 @@ MISARCH_FRONTEND_VERSION            = "latest"
 MISARCH_GATEWAY_VERSION             = "latest"
 MISARCH_INVENTORY_VERSION           = "latest"
 MISARCH_INVOICE_VERSION             = "latest"
-MISARCH_MEDIA_VERSION               = "latest"
+MISARCH_MEDIA_VERSION               = "main"
 MISARCH_NOTIFICATION_VERSION        = "latest"
 MISARCH_ORDER_VERSION               = "latest"
 MISARCH_PAYMENT_VERSION             = "latest"
@@ -22,3 +22,7 @@ MISARCH_TAX_VERSION                 = "latest"
 MISARCH_USER_VERSION                = "latest"
 MISARCH_WISHLIST_VERSION            = "latest"
 RABBITMQ_VERSION = "latest"
+
+# GKE-specific override: bump MongoDB resources above Bitnami "micro" preset (384Mi limit)
+# which OOMKills mongod under load. "medium" = 1024Mi req / 1536Mi limit.
+MONGODB_RESOURCE_PRESET = "medium"

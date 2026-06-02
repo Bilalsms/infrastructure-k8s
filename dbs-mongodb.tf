@@ -32,6 +32,8 @@ resource "helm_release" "misarch_inventory_db" {
     metrics:
       enabled: true
     resourcesPreset: "${var.MONGODB_RESOURCE_PRESET}"
+    updateStrategy:
+      type: Recreate
     EOF
   ]
 }
@@ -66,6 +68,8 @@ resource "helm_release" "misarch_invoice_db" {
     metrics:
       enabled: true
     resourcesPreset: "${var.MONGODB_RESOURCE_PRESET}"
+    updateStrategy:
+      type: Recreate
     EOF
   ]
 }
@@ -100,6 +104,8 @@ resource "helm_release" "misarch_media_db" {
     metrics:
       enabled: true
     resourcesPreset: "${var.MONGODB_RESOURCE_PRESET}"
+    updateStrategy:
+      type: Recreate
     EOF
   ]
 }
@@ -134,6 +140,8 @@ resource "helm_release" "misarch_order_db" {
     metrics:
       enabled: true
     resourcesPreset: "${var.MONGODB_RESOURCE_PRESET}"
+    updateStrategy:
+      type: Recreate
     EOF
   ]
 }
@@ -168,6 +176,8 @@ resource "helm_release" "misarch_payment_db" {
     metrics:
       enabled: true
     resourcesPreset: "${var.MONGODB_RESOURCE_PRESET}"
+    updateStrategy:
+      type: Recreate
     EOF
   ]
 }
@@ -202,6 +212,8 @@ resource "helm_release" "misarch_review_db" {
     metrics:
       enabled: true
     resourcesPreset: "${var.MONGODB_RESOURCE_PRESET}"
+    updateStrategy:
+      type: Recreate
     EOF
   ]
 }
@@ -236,6 +248,8 @@ resource "helm_release" "misarch_shoppingcart_db" {
     metrics:
       enabled: true
     resourcesPreset: "${var.MONGODB_RESOURCE_PRESET}"
+    updateStrategy:
+      type: Recreate
     EOF
   ]
 }
@@ -270,6 +284,8 @@ resource "helm_release" "misarch_wishlist_db" {
     metrics:
       enabled: true
     resourcesPreset: "${var.MONGODB_RESOURCE_PRESET}"
+    updateStrategy:
+      type: Recreate
     EOF
   ]
 }

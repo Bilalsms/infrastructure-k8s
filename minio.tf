@@ -17,6 +17,7 @@ resource "helm_release" "minio" {
     rootPassword: "${random_password.minio_admin_password.result}"
     persistence:
       enabled: true
+      size: "5Gi"
     resources:
       requests:
         memory: "512Mi"

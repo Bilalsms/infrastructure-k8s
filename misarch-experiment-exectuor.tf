@@ -100,4 +100,6 @@ resource "kubernetes_persistent_volume_claim" "misarch_experiment_executor_pvc" 
       }
     }
   }
+
+  wait_until_bound = false
 }
