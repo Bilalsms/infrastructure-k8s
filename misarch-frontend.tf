@@ -51,6 +51,19 @@ resource "kubernetes_deployment" "misarch_frontend" {
               name = local.misarch_frontend_env_vars_configmap
             }
           }
+
+          volume_mount {
+            name       = "nginx-template"
+            mount_path = "/etc/nginx/templates/default.conf.template"
+            sub_path   = "default.conf.template"
+          }
+        }
+
+        volume {
+          name = "nginx-template"
+          config_map {
+            name = kubernetes_config_map.misarch_frontend_nginx_template.metadata[0].name
+          }
         }
 
         container {
