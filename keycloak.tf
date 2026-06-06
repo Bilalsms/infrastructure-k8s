@@ -82,6 +82,12 @@ resource "kubernetes_deployment" "keycloak" {
               name = local.keycloak_env_vars_configmap
             }
           }
+
+          env_from {
+            secret_ref {
+              name = kubernetes_secret.keycloak_bootstrap.metadata[0].name
+            }
+          }
         }
 
         container {
@@ -120,6 +126,19 @@ resource "kubernetes_secret" "keycloak_auth" {
   data = {
     adminUser     = "admin"
     adminPassword = var.KEYCLOAK_ADMIN_PASSWORD
+  }
+}
+
+resource "kubernetes_secret" "keycloak_bootstrap" {
+  metadata {
+    name      = "keycloak-bootstrap"
+    namespace = var.KUBERNETES_NAMESPACE
+  }
+  data = {
+    KC_BOOTSTRAP_ADMIN_USERNAME = "admin"
+    KC_BOOTSTRAP_ADMIN_PASSWORD = var.KEYCLOAK_ADMIN_PASSWORD
+    KEYCLOAK_ADMIN              = "admin"
+    KEYCLOAK_ADMIN_PASSWORD     = var.KEYCLOAK_ADMIN_PASSWORD
   }
 }
 

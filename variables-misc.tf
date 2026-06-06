@@ -75,6 +75,32 @@ variable "RABBITMQ_ERLANG_COOKIE" {
   default = "RABBITMQ_MISARCH_ERLANG_COOKIE"
 }
 
+// ---- Ingress / TLS -------------------------------------------------------
+// Base host suffix for every public Ingress. Hostnames are built as
+// `<role>.misarch.<INGRESS_BASE_HOST>` (e.g. grafana.misarch.<base>).
+
+variable "INGRESS_BASE_HOST" {
+  type        = string
+  description = "Base host suffix for all Ingress resources. e.g. '34.x.x.x.nip.io' or 'misarch.net'."
+  default     = "misarch.local"
+}
+
+variable "CERT_ISSUER" {
+  type        = string
+  description = "cert-manager ClusterIssuer to use for Ingress TLS. 'selfsigned-cluster' or 'letsencrypt-prod'."
+  default     = "selfsigned-cluster"
+  validation {
+    condition     = contains(["selfsigned-cluster", "letsencrypt-prod"], var.CERT_ISSUER)
+    error_message = "CERT_ISSUER must be one of: selfsigned-cluster, letsencrypt-prod."
+  }
+}
+
+variable "LETSENCRYPT_EMAIL" {
+  type        = string
+  description = "Contact email Let's Encrypt uses for expiry warnings. Required when CERT_ISSUER=letsencrypt-prod."
+  default     = "admin@misarch.net"
+}
+
 locals {
   dapr_general_config_name = "dapr-config"
 }

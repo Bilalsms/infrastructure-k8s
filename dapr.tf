@@ -21,6 +21,13 @@ resource "helm_release" "redis" {
     persistence:
       enabled: true
     terminationGracePeriodSeconds: 30
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "1Gi"
 
   replica:
     replicaCount: 0

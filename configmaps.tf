@@ -72,6 +72,10 @@ resource "kubernetes_config_map" "keycloak_env_vars" {
     "KC_HTTP_PORT"           = "8080"
     "KC_DB_URL"              = "jdbc:postgresql://${local.keycloak_db_url}/keycloak"
     "KC_DB_PASSWORD"         = random_password.keycloak_db_password.result
+    "KC_PROXY"               = "edge"
+    "KC_HOSTNAME"            = "auth.misarch.${var.INGRESS_BASE_HOST}"
+    "KC_HOSTNAME_STRICT_BACKCHANNEL" = "true"
+    "KC_HTTP_RELATIVE_PATH"  = "/keycloak"
   }
 }
 
@@ -200,7 +204,7 @@ resource "kubernetes_config_map" "misarch_frontend_env_vars" {
 
   data = {
     "GATEWAY_ENDPOINT"  = local.dapr_misarch_gateway_url
-    "KEYCLOAK_ENDPOINT" = "http://${local.keycloak_url}/keycloak"
+    "KEYCLOAK_ENDPOINT" = "https://auth.misarch.${var.INGRESS_BASE_HOST}/keycloak"
     "MINIO_ENDPOINT"    = "http://${local.minio_url}"
   }
 }

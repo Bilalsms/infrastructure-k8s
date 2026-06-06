@@ -1,6 +1,5 @@
 // Instrumentation CR — tells the OTel Operator which SDK image to inject and
 // where injected pods should export their traces.
-// See projects/I_misarch_otel_operator_plan.md, Phase 3.
 
 resource "kubectl_manifest" "misarch_nodejs_instrumentation" {
   depends_on = [helm_release.opentelemetry_operator]

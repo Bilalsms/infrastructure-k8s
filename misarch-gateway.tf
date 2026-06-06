@@ -53,11 +53,11 @@ resource "kubernetes_deployment" "misarch_gateway" {
           resources {
             limits = {
               cpu    = "2400m"
-              memory = "5Gi"
+              memory = "8Gi"
             }
             requests = {
               cpu    = "100m"
-              memory = "200Mi"
+              memory = "512Mi"
             }
           }
 
