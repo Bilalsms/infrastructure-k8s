@@ -19,6 +19,15 @@ resource "kubernetes_config_map" "misarch_frontend_nginx_template" {
               try_files $uri $uri/ /index.html;
           }
 
+          location /assets/ {
+              root /usr/share/nginx/html;
+              sub_filter_types application/javascript;
+              sub_filter_once off;
+              sub_filter 'url:"/keycloak"' 'url:"$${KEYCLOAK_ENDPOINT}"';
+              sub_filter '"/assets/silent-check-sso-' '"$${SHOP_ORIGIN}/assets/silent-check-sso-';
+              sub_filter 'redirectUri:"/"' 'redirectUri:"$${SHOP_ORIGIN}/"';
+          }
+
           # Proxy /api/graphql
           location /api/graphql {
               proxy_pass $${GATEWAY_ENDPOINT};

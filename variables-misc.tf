@@ -39,13 +39,13 @@ variable "INFLUXDB_PASSWORD" {
   default = "admin123"
 }
 
-variable INFLUXDB_ORG {
-  type = string
+variable "INFLUXDB_ORG" {
+  type    = string
   default = "misarch"
 }
 
 variable "INFLUXDB_BUCKET" {
-  type = string
+  type    = string
   default = "gatling"
 }
 
@@ -65,24 +65,28 @@ variable "MISARCH_SIMULATION_PROCESSING_TIME_SECONDS" {
 }
 
 variable "MONGODB_RESOURCE_PRESET" {
-  type = string
+  type        = string
   description = "Sets a resource limit for MongoDBs. Values are as described in https://github.com/bitnami/charts/blob/4b89068b8267e4b115c676064d092a05813953cc/bitnami/common/templates/_resources.tpl#L16-L43. Default is 'micro', Helm Chart default was 'small'."
-  default = "micro"
+  default     = "micro"
 }
 
 variable "RABBITMQ_ERLANG_COOKIE" {
-  type = string
+  type    = string
   default = "RABBITMQ_MISARCH_ERLANG_COOKIE"
 }
 
 // ---- Ingress / TLS -------------------------------------------------------
-// Base host suffix for every public Ingress. Hostnames are built as
-// `<role>.misarch.<INGRESS_BASE_HOST>` (e.g. grafana.misarch.<base>).
-
-variable "INGRESS_BASE_HOST" {
+// GCP project and region — used by the google provider in main.tf and by
+// `google_compute_address.misarch_ingress` in ingress-nginx.tf.
+variable "GCP_PROJECT" {
   type        = string
-  description = "Base host suffix for all Ingress resources. e.g. '34.x.x.x.nip.io' or 'misarch.net'."
-  default     = "misarch.local"
+  description = "GCP project ID hosting the GKE cluster."
+}
+
+variable "GCP_REGION" {
+  type        = string
+  description = "GCP region for the reserved LB IP. Must match the GKE cluster region."
+  default     = "europe-west1"
 }
 
 variable "CERT_ISSUER" {

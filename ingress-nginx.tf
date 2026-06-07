@@ -4,8 +4,24 @@ resource "kubernetes_namespace" "ingress_nginx" {
   }
 }
 
+resource "google_compute_address" "misarch_ingress" {
+  name         = "misarch-ingress-lb"
+  region       = var.GCP_REGION
+  address_type = "EXTERNAL"
+  network_tier = "STANDARD"
+  description  = "Static IP for ingress-nginx LoadBalancer — managed by Terraform"
+
+  lifecycle {
+    ignore_changes = [description]
+  }
+}
+
+locals {
+  ingress_base_host = "${google_compute_address.misarch_ingress.address}.nip.io"
+}
+
 resource "helm_release" "ingress_nginx" {
-  depends_on = [kubernetes_namespace.ingress_nginx]
+  depends_on = [kubernetes_namespace.ingress_nginx, google_compute_address.misarch_ingress]
   name       = "ingress-nginx"
   repository = "https://kubernetes.github.io/ingress-nginx"
   chart      = "ingress-nginx"
@@ -20,6 +36,7 @@ resource "helm_release" "ingress_nginx" {
       service:
         type: LoadBalancer
         externalTrafficPolicy: Local
+        loadBalancerIP: ${google_compute_address.misarch_ingress.address}
         annotations:
           # Force a regional (not premium global) tier — cheaper, fine for measurement.
           cloud.google.com/network-tier: "Standard"
@@ -69,11 +86,11 @@ output "ingress_load_balancer_ip" {
 output "ingress_hosts" {
   description = "Hostnames the ingress will serve once DNS resolves to the LB IP."
   value = {
-    frontend   = "misarch.${var.INGRESS_BASE_HOST}"
-    gateway    = "api.misarch.${var.INGRESS_BASE_HOST}"
-    keycloak   = "auth.misarch.${var.INGRESS_BASE_HOST}"
-    grafana    = "grafana.misarch.${var.INGRESS_BASE_HOST}"
-    prometheus = "prometheus.misarch.${var.INGRESS_BASE_HOST}"
-    minio      = "minio.misarch.${var.INGRESS_BASE_HOST}"
+    frontend   = "misarch.${local.ingress_base_host}"
+    gateway    = "api.misarch.${local.ingress_base_host}"
+    keycloak   = "auth.misarch.${local.ingress_base_host}"
+    grafana    = "grafana.misarch.${local.ingress_base_host}"
+    prometheus = "prometheus.misarch.${local.ingress_base_host}"
+    minio      = "minio.misarch.${local.ingress_base_host}"
   }
 }

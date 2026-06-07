@@ -4,7 +4,16 @@ terraform {
       source  = "gavinbunney/kubectl"
       version = "~> 1.14.0"
     }
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.0"
+    }
   }
+}
+
+provider "google" {
+  project = var.GCP_PROJECT
+  region  = var.GCP_REGION
 }
 
 provider "kubernetes" {

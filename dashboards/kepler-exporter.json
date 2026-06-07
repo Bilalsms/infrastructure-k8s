@@ -98,9 +98,9 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "( sum(\n      increase(\n         (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[24h:1m])\n      )\n   ) * $watt_per_second_to_kWh \n) * $coal",
+          "expr": "( sum(\n      increase(\n         (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[24h:1m])\n      )\n   ) * $watt_per_second_to_kWh \n) * $carbon_intensity_de",
           "hide": false,
-          "legendFormat": "CO2 Coal",
+          "legendFormat": "CO₂eq DE (kg)",
           "range": true,
           "refId": "A"
         },
@@ -110,9 +110,9 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "( sum(\n      increase(\n         (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[24h:1m])\n      )\n   ) * $watt_per_second_to_kWh \n) * $petroleum",
+          "expr": "( sum(\n      increase(\n         (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[24h:1m])\n      )\n   ) * $watt_per_second_to_kWh \n) * $carbon_intensity_eu",
           "hide": false,
-          "legendFormat": "CO2 Petroleum",
+          "legendFormat": "CO₂eq EU avg (kg)",
           "range": true,
           "refId": "B"
         },
@@ -122,14 +122,14 @@
             "uid": "${datasource}"
           },
           "editorMode": "code",
-          "expr": "( sum(\n      increase(\n         (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[24h:1m])\n      )\n   ) * $watt_per_second_to_kWh \n) * $natural_gas",
+          "expr": "( sum(\n      increase(\n         (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[24h:1m])\n      )\n   ) * $watt_per_second_to_kWh \n) * $cost_per_kwh_eur",
           "hide": false,
-          "legendFormat": "CO2 Natural Gas",
+          "legendFormat": "Cost (EUR)",
           "range": true,
           "refId": "C"
         }
       ],
-      "title": "Carbon Footprint (pounds per kWh per day) in Namespace: $namespace  (PKG+DRAM+OTHER+GPU)",
+      "title": "Carbon Footprint & Cost (24h) — Namespace: $namespace (PKG+DRAM+OTHER+GPU). Units: kg CO₂eq, EUR. DE grid ≈ 350 gCO₂eq/kWh (UBA 2024), EU avg ≈ 250 gCO₂eq/kWh (EEA 2024).",
       "transparent": true,
       "type": "gauge"
     },
@@ -883,60 +883,63 @@
       {
         "current": {
           "selected": false,
-          "text": "2.23",
-          "value": "2.23"
+          "text": "0.350",
+          "value": "0.350"
         },
+        "description": "Carbon intensity of German electricity grid in kg CO₂eq per kWh. Default 0.350 (Umweltbundesamt 2024, lifecycle).",
         "hide": 0,
-        "label": "Coal Coeff",
-        "name": "coal",
+        "label": "DE carbon intensity (kgCO₂eq/kWh)",
+        "name": "carbon_intensity_de",
         "options": [
           {
             "selected": true,
-            "text": "2.23",
-            "value": "2.23"
+            "text": "0.350",
+            "value": "0.350"
           }
         ],
-        "query": "2.23",
+        "query": "0.350",
         "skipUrlSync": false,
         "type": "textbox"
       },
       {
         "current": {
           "selected": false,
-          "text": "0.91",
-          "value": "0.91"
+          "text": "0.250",
+          "value": "0.250"
         },
+        "description": "Carbon intensity of EU electricity mix in kg CO₂eq per kWh. Default 0.250 (EEA 2024).",
         "hide": 0,
-        "label": "Natural Gas Coeff",
-        "name": "natural_gas",
+        "label": "EU carbon intensity (kgCO₂eq/kWh)",
+        "name": "carbon_intensity_eu",
         "options": [
           {
             "selected": true,
-            "text": "0.91",
-            "value": "0.91"
+            "text": "0.250",
+            "value": "0.250"
           }
         ],
-        "query": "0.91",
+        "query": "0.250",
         "skipUrlSync": false,
         "type": "textbox"
       },
       {
         "current": {
           "selected": false,
-          "text": "2.13",
-          "value": "2.13"
+          "text": "0.30",
+          "value": "0.30"
         },
+        "description": "Retail electricity price in EUR per kWh. Default 0.30 (DE business tariff 2024).",
         "hide": 0,
-        "label": "Petroleum Coeff",
-        "name": "petroleum",
+        "label": "Electricity cost (EUR/kWh)",
+        "name": "cost_per_kwh_eur",
         "options": [
           {
             "selected": true,
-            "text": "2.13",
-            "value": "2.13"
+            "text": "0.30",
+            "value": "0.30"
           }
         ],
-        "query": "2.13",
+        "query": "0.30",
         "skipUrlSync": false,
         "type": "textbox"
       },

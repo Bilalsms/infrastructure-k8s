@@ -1,7 +1,7 @@
 // External routing for every service the operator / users need to reach.
 //
 // One nginx-ingress controller (see ingress-nginx.tf) fronts everything.
-// Hostnames are built from var.INGRESS_BASE_HOST so the operator can flip the whole
+// Hostnames are built from local.ingress_base_host so the operator can flip the whole
 // fleet to e.g. "<lb-ip>.nip.io" without editing this file.
 //
 // Each Ingress carries `cert-manager.io/cluster-issuer` so cert-manager auto-issues
@@ -12,12 +12,12 @@ locals {
   issuer        = var.CERT_ISSUER
 
   ingress_hosts = {
-    frontend   = "misarch.${var.INGRESS_BASE_HOST}"
-    gateway    = "api.misarch.${var.INGRESS_BASE_HOST}"
-    keycloak   = "auth.misarch.${var.INGRESS_BASE_HOST}"
-    grafana    = "grafana.misarch.${var.INGRESS_BASE_HOST}"
-    prometheus = "prometheus.misarch.${var.INGRESS_BASE_HOST}"
-    minio      = "minio.misarch.${var.INGRESS_BASE_HOST}"
+    frontend   = "misarch.${local.ingress_base_host}"
+    gateway    = "api.misarch.${local.ingress_base_host}"
+    keycloak   = "auth.misarch.${local.ingress_base_host}"
+    grafana    = "grafana.misarch.${local.ingress_base_host}"
+    prometheus = "prometheus.misarch.${local.ingress_base_host}"
+    minio      = "minio.misarch.${local.ingress_base_host}"
   }
 
   common_ingress_annotations = {
@@ -114,6 +114,80 @@ resource "kubernetes_ingress_v1" "misarch_gateway" {
               name = local.misarch_gateway_service_name
               // Gateway exposes 8080 internally; service maps it to 8080 too.
               port { number = 8080 }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_ingress_v1" "misarch_simulation_redirect" {
+  depends_on = [helm_release.ingress_nginx]
+  metadata {
+    name      = "misarch-simulation-redirect-ingress"
+    namespace = local.namespace
+    annotations = merge(local.common_ingress_annotations, {
+      "nginx.ingress.kubernetes.io/permanent-redirect"      = "https://$host/frontend/"
+      "nginx.ingress.kubernetes.io/permanent-redirect-code" = "308"
+      "nginx.ingress.kubernetes.io/use-regex"               = "true"
+    })
+  }
+  spec {
+    ingress_class_name = local.ingress_class
+
+    rule {
+      host = local.ingress_hosts.frontend
+      http {
+        path {
+          path      = "/simulate(/.*)?"
+          path_type = "ImplementationSpecific"
+          backend {
+            service {
+              name = local.misarch_experiment_executor_frontend_service_name
+              port { number = 80 }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_ingress_v1" "misarch_simulation" {
+  depends_on = [helm_release.ingress_nginx, kubernetes_service.misarch_experiment_executor_frontend]
+  metadata {
+    name      = "misarch-simulation-ingress"
+    namespace = local.namespace
+    annotations = merge(local.common_ingress_annotations, {
+      "nginx.ingress.kubernetes.io/proxy-read-timeout" = "300"
+      "nginx.ingress.kubernetes.io/proxy-send-timeout" = "300"
+    })
+  }
+  spec {
+    ingress_class_name = local.ingress_class
+
+    rule {
+      host = local.ingress_hosts.frontend
+      http {
+        path {
+          path      = "/frontend"
+          path_type = "Prefix"
+          backend {
+            service {
+              name = local.misarch_experiment_executor_frontend_service_name
+              port { number = 80 }
+            }
+          }
+        }
+
+        path {
+          path      = "/experiment"
+          path_type = "Prefix"
+          backend {
+            service {
+              name = local.misarch_experiment_executor_service_name
+              port { number = local.experiment_executor_port }
             }
           }
         }

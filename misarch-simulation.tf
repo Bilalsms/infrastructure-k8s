@@ -1,3 +1,23 @@
+resource "kubernetes_service" "misarch_simulation" {
+  metadata {
+    name      = local.misarch_simulation_service_name
+    labels    = merge(local.base_misarch_labels, local.misarch_simulation_specific_labels)
+    namespace = local.namespace
+  }
+
+  spec {
+    selector = {
+      app = local.misarch_simulation_service_name
+    }
+
+    port {
+      name        = "http"
+      port        = local.simulation_port
+      target_port = local.simulation_port
+    }
+  }
+}
+
 resource "kubernetes_deployment" "misarch_simulation" {
   depends_on = [terraform_data.dapr, kubernetes_deployment.keycloak]
   metadata {
