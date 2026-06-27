@@ -17,3 +17,17 @@ resource "kubernetes_config_map" "kepler_dashboard" {
     "kepler-exporter.json" = file("${path.module}/dashboards/kepler-exporter.json")
   }
 }
+
+resource "kubernetes_config_map" "cnae_energy_dashboard" {
+  metadata {
+    name      = "cnae-energy-dashboard"
+    namespace = local.namespace
+    labels = {
+      grafana_dashboard = "1"
+    }
+  }
+
+  data = {
+    "cnae-energy.json" = file("${path.module}/dashboards/cnae-energy.json")
+  }
+}
