@@ -51,12 +51,12 @@ resource "kubernetes_deployment" "misarch_chaostoolkit_executor" {
 
           resources {
             limits = {
-              cpu    = "500m"
-              memory = "500Mi"
+              cpu    = "200m"
+              memory = "256Mi"
             }
             requests = {
-              cpu    = "10m"
-              memory = "50Mi"
+              cpu    = "20m"
+              memory = "96Mi"
             }
           }
 

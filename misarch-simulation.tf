@@ -52,12 +52,12 @@ resource "kubernetes_deployment" "misarch_simulation" {
 
           resources {
             limits = {
-              cpu    = "500m"
-              memory = "1200Mi"
+              cpu    = "200m"
+              memory = "448Mi"
             }
             requests = {
-              cpu    = "100m"
-              memory = "400Mi"
+              cpu    = "50m"
+              memory = "240Mi"
             }
           }
 
@@ -81,12 +81,12 @@ resource "kubernetes_deployment" "misarch_simulation" {
 
           resources {
             limits = {
-              cpu    = "2000m"
-              memory = "2Gi"
+              cpu    = "200m"
+              memory = "256Mi"
             }
             requests = {
               cpu    = "10m"
-              memory = "50Mi"
+              memory = "80Mi"
             }
           }
 

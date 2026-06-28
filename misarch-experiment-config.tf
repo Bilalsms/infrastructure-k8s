@@ -52,12 +52,12 @@ resource "kubernetes_deployment" "misarch_experiment_config" {
 
           resources {
             limits = {
-              cpu    = "500m"
-              memory = "1200Mi"
+              cpu    = "300m"
+              memory = "480Mi"
             }
             requests = {
-              cpu    = "100m"
-              memory = "400Mi"
+              cpu    = "130m"
+              memory = "272Mi"
             }
           }
 

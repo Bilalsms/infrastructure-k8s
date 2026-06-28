@@ -26,14 +26,15 @@ resource "helm_release" "misarch_inventory_db" {
   values = [
     <<-EOF
     fullnameOverride: "${local.inventory_db_service_name}"
-    architecture: "standalone"
+    architecture: "replicaset"
+    replicaCount: 1
     auth:
       enabled: false
     metrics:
       enabled: true
     resourcesPreset: "${var.MONGODB_RESOURCE_PRESET}"
-    updateStrategy:
-      type: Recreate
+    arbiter:
+      enabled: false
     EOF
   ]
 }

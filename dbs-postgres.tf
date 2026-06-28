@@ -13,6 +13,8 @@ resource "helm_release" "misarch_address_db" {
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_address_db_password.result}"
+    primary:
+      resourcesPreset: nano
     metrics:
       enabled: true
     EOF
@@ -34,6 +36,8 @@ resource "helm_release" "misarch_catalog_db" {
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_catalog_db_password.result}"
+    primary:
+      resourcesPreset: nano
     metrics:
       enabled: true
     EOF
@@ -54,6 +58,8 @@ resource "helm_release" "misarch_discount_db" {
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_discount_db_password.result}"
+    primary:
+      resourcesPreset: nano
     metrics:
       enabled: true
     EOF
@@ -75,6 +81,8 @@ resource "helm_release" "misarch_notification_db" {
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_notification_db_password.result}"
+    primary:
+      resourcesPreset: nano
     metrics:
       enabled: true
     EOF
@@ -96,6 +104,8 @@ resource "helm_release" "misarch_return_db" {
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_return_db_password.result}"
+    primary:
+      resourcesPreset: nano
     metrics:
       enabled: true
     EOF
@@ -117,6 +127,8 @@ resource "helm_release" "misarch_shipment_db" {
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_shipment_db_password.result}"
+    primary:
+      resourcesPreset: nano
     metrics:
       enabled: true
     EOF
@@ -138,6 +150,8 @@ resource "helm_release" "misarch_tax_db" {
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_tax_db_password.result}"
+    primary:
+      resourcesPreset: nano
     metrics:
       enabled: true
     EOF
@@ -159,6 +173,8 @@ resource "helm_release" "misarch_user_db" {
       username: "${var.MISARCH_DB_USER}"
       database: "${var.MISARCH_DB_DATABASE}"
       password: "${random_password.misarch_user_db_password.result}"
+    primary:
+      resourcesPreset: nano
     metrics:
       enabled: true
     EOF
@@ -180,6 +196,8 @@ resource "helm_release" "misarch_keycloak_db" {
       username: ${var.KEYCLOAK_DB_USER}
       database: ${var.KEYCLOAK_DB_DATABASE}
       password: "${random_password.keycloak_db_password.result}"
+    primary:
+      resourcesPreset: nano
     metrics:
       enabled: false
     EOF

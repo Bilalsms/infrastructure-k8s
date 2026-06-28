@@ -50,12 +50,12 @@ resource "kubernetes_deployment" "misarch_gatling_executor" {
 
           resources {
             limits = {
-              cpu    = "5000m"
-              memory = "5Gi"
+              cpu    = "200m"
+              memory = "1024Mi"
             }
             requests = {
-              cpu    = "100m"
-              memory = "500Mi"
+              cpu    = "20m"
+              memory = "576Mi"
             }
           }
 

@@ -50,12 +50,12 @@ resource "kubernetes_deployment" "misarch_experiment_config_frontend" {
 
           resources {
             limits = {
-              cpu    = "100m"
-              memory = "100Mi"
+              cpu    = "200m"
+              memory = "256Mi"
             }
             requests = {
-              cpu    = "40m"
-              memory = "50Mi"
+              cpu    = "20m"
+              memory = "96Mi"
             }
           }
 

@@ -104,7 +104,7 @@ locals {
   keycloak_db_full_service_name     = local.keycloak_db_service_name
 
   // MongoDB
-  inventory_db_full_service_name    = local.inventory_db_service_name
+  inventory_db_full_service_name    = "${local.inventory_db_service_name}-headless"
   invoice_db_full_service_name      = local.invoice_db_service_name
   media_db_full_service_name        = local.media_db_service_name
   order_db_full_service_name        = local.order_db_service_name

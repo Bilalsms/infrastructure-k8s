@@ -33,8 +33,8 @@ resource "kubernetes_deployment" "misarch_payment" {
 
           resources {
             limits = {
-              cpu    = "500m"
-              memory = "1200Mi"
+              cpu    = "200m"
+              memory = "704Mi"
             }
             requests = {
               cpu    = "100m"
@@ -62,12 +62,12 @@ resource "kubernetes_deployment" "misarch_payment" {
 
           resources {
             limits = {
-              cpu    = "2000m"
-              memory = "2Gi"
+              cpu    = "200m"
+              memory = "256Mi"
             }
             requests = {
               cpu    = "10m"
-              memory = "50Mi"
+              memory = "80Mi"
             }
           }
 
