@@ -35,3 +35,6 @@ override.tf.json
 terraform.rc
 
 kubeconfig.yaml
+
+__pycache__/
+.terraform*.hcl

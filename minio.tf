@@ -14,7 +14,10 @@ resource "helm_release" "minio" {
     fullnameOverride: "${local.minio_service_name}"
     mode: "standalone"
     rootUser: "admin"
-    rootPassword: "${random_password.minio_admin_password.result}"
+    # Upstream `misarch/media/src/main.rs` hardcodes credentials
+    # Proper long-term fix: fork media to read MINIO_USER / MINIO_PASSWORD
+    # from env vars (analogous to the inventory pubSubName custom image).
+    rootPassword: "password"
     persistence:
       enabled: true
       size: "5Gi"

@@ -25,6 +25,7 @@ locals {
     "nginx.ingress.kubernetes.io/force-ssl-redirect" = "true"
     "nginx.ingress.kubernetes.io/proxy-body-size"    = "20m"
     "nginx.ingress.kubernetes.io/proxy-buffer-size"  = "16k"
+    "nginx.ingress.kubernetes.io/hsts" = "false"
   }
 }
 
