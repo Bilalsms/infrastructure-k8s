@@ -27,7 +27,7 @@ RABBITMQ_VERSION                    = "latest"
 # which OOMKills mongod under load. "medium" = 1024Mi req / 1536Mi limit.
 MONGODB_RESOURCE_PRESET = "medium"
 
-GCP_PROJECT       = "misarch"
-GCP_REGION        = "europe-west1"
-CERT_ISSUER       = "letsencrypt-prod"
-LETSENCRYPT_EMAIL = "admin@misarch.net"
+GCP_PROJECT = "misarch"
+GCP_REGION  = "europe-west1"
+CERT_ISSUER = "selfsigned-cluster"
+# LETSENCRYPT_EMAIL removed; LE support dropped (nip.io rate-limit risk on reproduction).

@@ -7,6 +7,13 @@ resource "kubernetes_deployment" "misarch_order" {
     namespace = local.namespace
   }
 
+  // HPA owns replicas (see hpa.tf). Without ignore_changes, every `terraform
+  // apply` would reset replicas to 1 and the HPA would immediately scale it
+  // back up — perpetual diff and pod churn that contaminates energy readings.
+  lifecycle {
+    ignore_changes = [spec[0].replicas]
+  }
+
   spec {
     replicas = 1
 

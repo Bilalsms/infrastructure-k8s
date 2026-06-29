@@ -101,6 +101,8 @@ import_if_missing "helm_release.cert_manager"                                "ce
 import_if_missing "kubernetes_namespace.cert_manager"                        "cert-manager"
 import_if_missing "kubernetes_namespace.kepler"                              "kepler"
 import_if_missing "helm_release.kepler"                                      "kepler/kepler"
+import_if_missing "kubernetes_namespace.keda"                                "keda"
+import_if_missing "helm_release.keda"                                        "keda/keda"
 
 echo "==> Importing existing kubectl_manifest resources..."
 import_if_missing 'kubectl_manifest.dapr_state_config'                        "dapr.io/v1alpha1//Component//statestore//misarch"

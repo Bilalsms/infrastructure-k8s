@@ -14,7 +14,7 @@ resource "helm_release" "minio" {
     fullnameOverride: "${local.minio_service_name}"
     mode: "standalone"
     rootUser: "admin"
-    rootPassword: "password"
+    rootPassword: "${random_password.minio_admin_password.result}"
     persistence:
       enabled: true
       size: "5Gi"

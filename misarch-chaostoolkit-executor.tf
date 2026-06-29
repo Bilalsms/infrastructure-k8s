@@ -11,8 +11,8 @@ resource "kubernetes_service" "misarch_chaostoolkit_executor" {
     }
 
     port {
-      name       = "http"
-      port       = 8890
+      name        = "http"
+      port        = 8890
       target_port = 8890
     }
   }
@@ -37,7 +37,7 @@ resource "kubernetes_deployment" "misarch_chaostoolkit_executor" {
 
     template {
       metadata {
-        labels      = merge(local.base_misarch_labels, local.misarch_chaostoolkit_executor_specific_labels)
+        labels = merge(local.base_misarch_labels, local.misarch_chaostoolkit_executor_specific_labels)
       }
 
       spec {
@@ -101,8 +101,8 @@ resource "kubernetes_cluster_role_binding" "misarch_chaostoolkit_executor" {
   }
 
   role_ref {
-    kind     = "ClusterRole"
-    name     = kubernetes_cluster_role.misarch_chaostoolkit_executor.metadata[0].name
+    kind      = "ClusterRole"
+    name      = kubernetes_cluster_role.misarch_chaostoolkit_executor.metadata[0].name
     api_group = "rbac.authorization.k8s.io"
   }
 

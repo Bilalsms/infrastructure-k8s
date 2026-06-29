@@ -17,7 +17,6 @@ locals {
     keycloak   = "auth.misarch.${local.ingress_base_host}"
     grafana    = "grafana.misarch.${local.ingress_base_host}"
     prometheus = "prometheus.misarch.${local.ingress_base_host}"
-    minio      = "minio.misarch.${local.ingress_base_host}"
   }
 
   common_ingress_annotations = {
@@ -271,14 +270,34 @@ resource "kubernetes_ingress_v1" "grafana" {
 }
 
 // ---------- Prometheus (PromQL exploration / k6 metric pulls) ----------
-// No auth on the UI — this exposes raw metrics. Acceptable for a measurement cluster;
-// for shared / public deployments, layer a basic-auth annotation on top.
-resource "kubernetes_ingress_v1" "prometheus" {
-  depends_on = [helm_release.ingress_nginx, helm_release.prometheus_grafana_stack]
+// Basic-auth Secret for the public Prometheus UI. Username admin, password
+// from random_password.prometheus_basic_auth_password (read via terraform output).
+// Format expected by nginx-ingress: "<user>:<bcrypted-password>".
+resource "kubernetes_secret" "prometheus_basic_auth" {
   metadata {
-    name        = "prometheus-ingress"
-    namespace   = local.namespace
-    annotations = local.common_ingress_annotations
+    name      = "prometheus-basic-auth"
+    namespace = local.namespace
+  }
+  data = {
+    auth = "admin:${bcrypt(random_password.prometheus_basic_auth_password.result)}"
+  }
+  lifecycle {
+    // bcrypt() is non-deterministic — without this every apply re-hashes the
+    // same password and updates the Secret. Pin to the initial hash.
+    ignore_changes = [data]
+  }
+}
+
+resource "kubernetes_ingress_v1" "prometheus" {
+  depends_on = [helm_release.ingress_nginx, helm_release.prometheus_grafana_stack, kubernetes_secret.prometheus_basic_auth]
+  metadata {
+    name      = "prometheus-ingress"
+    namespace = local.namespace
+    annotations = merge(local.common_ingress_annotations, {
+      "nginx.ingress.kubernetes.io/auth-type"   = "basic"
+      "nginx.ingress.kubernetes.io/auth-secret" = kubernetes_secret.prometheus_basic_auth.metadata[0].name
+      "nginx.ingress.kubernetes.io/auth-realm"  = "Prometheus (admin / see terraform output prometheus_basic_auth_password)"
+    })
   }
   spec {
     ingress_class_name = local.ingress_class
@@ -307,36 +326,3 @@ resource "kubernetes_ingress_v1" "prometheus" {
   }
 }
 
-// ---------- MinIO console (object storage) ----------
-resource "kubernetes_ingress_v1" "minio" {
-  depends_on = [helm_release.ingress_nginx]
-  metadata {
-    name        = "minio-ingress"
-    namespace   = local.namespace
-    annotations = local.common_ingress_annotations
-  }
-  spec {
-    ingress_class_name = local.ingress_class
-
-    tls {
-      hosts       = [local.ingress_hosts.minio]
-      secret_name = "tls-minio"
-    }
-
-    rule {
-      host = local.ingress_hosts.minio
-      http {
-        path {
-          path      = "/"
-          path_type = "Prefix"
-          backend {
-            service {
-              name = local.minio_service_name
-              port { number = local.minio_port }
-            }
-          }
-        }
-      }
-    }
-  }
-}

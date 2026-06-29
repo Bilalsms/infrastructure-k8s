@@ -297,7 +297,11 @@ def fetch_image(tags: str) -> bytes:
     """Fetch an 800x800 CC-licensed image matching `tags` (comma-separated)
     via loremflickr — no API key required. `lock=<n>` pins the same image
     for a given tag set so re-seeds get the same picture per product."""
-    seed = abs(hash(tags)) % 100000
+    # Built-in hash() is salted per-interpreter via PYTHONHASHSEED, so it
+    # would give different images each re-seed — breaking the "same picture
+    # per tag set" promise above. Use sha1 for cross-run stability.
+    import hashlib
+    seed = int(hashlib.sha1(tags.encode()).hexdigest(), 16) % 100000
     r = requests.get(f"{LOREMFLICKR_BASE}/{tags}?lock={seed}", timeout=30, allow_redirects=True)
     r.raise_for_status()
     return r.content

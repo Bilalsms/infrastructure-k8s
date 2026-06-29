@@ -24,11 +24,11 @@ locals {
     "dapr.io/app-port" = local.experiment_config_sidecar_port
   }
   minio_specific_annotations = {
-    "dapr.io/app-id"  = "minio"
+    "dapr.io/app-id"   = "minio"
     "dapr.io/app-port" = local.minio_port
-    "prometheus.io/scrape": "true"
-    "prometheus.io/path": "/minio/v2/metrics/cluster"
-    "prometheus.io/port": local.minio_port
+    "prometheus.io/scrape" : "true"
+    "prometheus.io/path" : "/minio/v2/metrics/cluster"
+    "prometheus.io/port" : local.minio_port
   }
   misarch_address_specific_annotations = {
     "dapr.io/app-id"   = "address"
@@ -54,14 +54,14 @@ locals {
     "dapr.io/app-id"   = "gateway"
     "dapr.io/app-port" = local.experiment_config_sidecar_port
     # OTel Operator: auto-inject Node SDK into the app container only.
-    "instrumentation.opentelemetry.io/inject-nodejs"    = "misarch/misarch-nodejs"
-    "instrumentation.opentelemetry.io/container-names"  = "misarch-gateway"
+    "instrumentation.opentelemetry.io/inject-nodejs"   = "misarch/misarch-nodejs"
+    "instrumentation.opentelemetry.io/container-names" = "misarch-gateway"
   }
   misarch_inventory_specific_annotations = {
-    "dapr.io/app-id"   = "inventory"
-    "dapr.io/app-port" = local.experiment_config_sidecar_port
-    "instrumentation.opentelemetry.io/inject-nodejs"    = "misarch/misarch-nodejs"
-    "instrumentation.opentelemetry.io/container-names"  = "misarch-inventory"
+    "dapr.io/app-id"                                   = "inventory"
+    "dapr.io/app-port"                                 = local.experiment_config_sidecar_port
+    "instrumentation.opentelemetry.io/inject-nodejs"   = "misarch/misarch-nodejs"
+    "instrumentation.opentelemetry.io/container-names" = "misarch-inventory"
   }
   misarch_invoice_specific_annotations = {
     "dapr.io/app-id"   = "invoice"
@@ -80,10 +80,10 @@ locals {
     "dapr.io/app-port" = local.experiment_config_sidecar_port
   }
   misarch_payment_specific_annotations = {
-    "dapr.io/app-id"   = "payment"
-    "dapr.io/app-port" = local.experiment_config_sidecar_port
-    "instrumentation.opentelemetry.io/inject-nodejs"    = "misarch/misarch-nodejs"
-    "instrumentation.opentelemetry.io/container-names"  = "misarch-payment"
+    "dapr.io/app-id"                                   = "payment"
+    "dapr.io/app-port"                                 = local.experiment_config_sidecar_port
+    "instrumentation.opentelemetry.io/inject-nodejs"   = "misarch/misarch-nodejs"
+    "instrumentation.opentelemetry.io/container-names" = "misarch-payment"
   }
   misarch_review_specific_annotations = {
     "dapr.io/app-id"   = "review"
@@ -102,10 +102,10 @@ locals {
     "dapr.io/app-port" = local.experiment_config_sidecar_port
   }
   misarch_simulation_specific_annotations = {
-    "dapr.io/app-id"   = "simulation"
-    "dapr.io/app-port" = local.experiment_config_sidecar_port
-    "instrumentation.opentelemetry.io/inject-nodejs"    = "misarch/misarch-nodejs"
-    "instrumentation.opentelemetry.io/container-names"  = "misarch-simulation"
+    "dapr.io/app-id"                                   = "simulation"
+    "dapr.io/app-port"                                 = local.experiment_config_sidecar_port
+    "instrumentation.opentelemetry.io/inject-nodejs"   = "misarch/misarch-nodejs"
+    "instrumentation.opentelemetry.io/container-names" = "misarch-simulation"
   }
   misarch_tax_specific_annotations = {
     "dapr.io/app-id"   = "tax"

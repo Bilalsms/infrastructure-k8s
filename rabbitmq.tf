@@ -30,7 +30,7 @@ resource "kubernetes_deployment" "rabbitmq" {
 
     template {
       metadata {
-        labels      = merge(local.base_misarch_labels, local.rabbitmq_specific_labels)
+        labels = merge(local.base_misarch_labels, local.rabbitmq_specific_labels)
         annotations = merge(local.base_misarch_annotations, local.rabbitmq_specific_annotations, {
           "prometheus.io/scrape" = "true"
           "prometheus.io/path"   = "/metrics"

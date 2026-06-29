@@ -2,7 +2,7 @@ resource "kubernetes_service" "keycloak" {
   metadata {
     name      = local.keycloak_service_name
     namespace = local.namespace
-    labels = merge(local.base_misarch_labels, local.misarch_keycloak_specific_labels)
+    labels    = merge(local.base_misarch_labels, local.misarch_keycloak_specific_labels)
   }
 
   spec {

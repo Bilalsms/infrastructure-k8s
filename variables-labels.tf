@@ -78,9 +78,9 @@ locals {
     app = local.misarch_experiment_executor_frontend_service_name
   }
   misarch_gatling_executor_specific_labels = {
-      app = local.misarch_gatling_executor_service_name
+    app = local.misarch_gatling_executor_service_name
   }
   misarch_chaostoolkit_executor_specific_labels = {
-      app = local.misarch_chaostoolkit_executor_service_name
+    app = local.misarch_chaostoolkit_executor_service_name
   }
 }

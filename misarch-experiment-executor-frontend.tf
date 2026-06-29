@@ -11,8 +11,8 @@ resource "kubernetes_service" "misarch_experiment_executor_frontend" {
     }
 
     port {
-      name       = "http"
-      port       = 80
+      name        = "http"
+      port        = 80
       target_port = 80
     }
   }
@@ -37,7 +37,7 @@ resource "kubernetes_deployment" "misarch_experiment_executor_frontend" {
 
     template {
       metadata {
-        labels      = merge(local.base_misarch_labels, local.misarch_experiment_executor_frontend_specific_labels)
+        labels = merge(local.base_misarch_labels, local.misarch_experiment_executor_frontend_specific_labels)
       }
 
       spec {

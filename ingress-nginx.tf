@@ -85,12 +85,6 @@ output "ingress_load_balancer_ip" {
 
 output "ingress_hosts" {
   description = "Hostnames the ingress will serve once DNS resolves to the LB IP."
-  value = {
-    frontend   = "misarch.${local.ingress_base_host}"
-    gateway    = "api.misarch.${local.ingress_base_host}"
-    keycloak   = "auth.misarch.${local.ingress_base_host}"
-    grafana    = "grafana.misarch.${local.ingress_base_host}"
-    prometheus = "prometheus.misarch.${local.ingress_base_host}"
-    minio      = "minio.misarch.${local.ingress_base_host}"
-  }
+  // Single source of truth: local.ingress_hosts in ingress.tf.
+  value = local.ingress_hosts
 }

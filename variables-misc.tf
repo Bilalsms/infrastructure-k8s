@@ -91,18 +91,12 @@ variable "GCP_REGION" {
 
 variable "CERT_ISSUER" {
   type        = string
-  description = "cert-manager ClusterIssuer to use for Ingress TLS. 'selfsigned-cluster' or 'letsencrypt-prod'."
+  description = "cert-manager ClusterIssuer to use for Ingress TLS. Currently only 'selfsigned-cluster' is supported; Let's Encrypt was removed because every public host in this project is under nip.io (shared registered domain) and would hit LE rate limits on reproduction runs."
   default     = "selfsigned-cluster"
   validation {
-    condition     = contains(["selfsigned-cluster", "letsencrypt-prod"], var.CERT_ISSUER)
-    error_message = "CERT_ISSUER must be one of: selfsigned-cluster, letsencrypt-prod."
+    condition     = var.CERT_ISSUER == "selfsigned-cluster"
+    error_message = "CERT_ISSUER must be 'selfsigned-cluster'. Let's Encrypt support removed — see cert-issuers.tf for rationale."
   }
-}
-
-variable "LETSENCRYPT_EMAIL" {
-  type        = string
-  description = "Contact email Let's Encrypt uses for expiry warnings. Required when CERT_ISSUER=letsencrypt-prod."
-  default     = "admin@misarch.net"
 }
 
 locals {

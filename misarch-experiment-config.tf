@@ -11,8 +11,8 @@ resource "kubernetes_service" "misarch_experiment_config" {
     }
 
     port {
-      name       = "http"
-      port       = 80
+      name        = "http"
+      port        = 80
       target_port = 8080
     }
   }

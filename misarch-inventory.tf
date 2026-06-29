@@ -7,6 +7,13 @@ resource "kubernetes_deployment" "misarch_inventory" {
     namespace = local.namespace
   }
 
+  // HPA owns replicas (see hpa.tf). Without ignore_changes, every `terraform
+  // apply` would reset replicas to 1 and the HPA would immediately scale it
+  // back up — perpetual diff and pod churn that contaminates energy readings.
+  lifecycle {
+    ignore_changes = [spec[0].replicas]
+  }
+
   spec {
     replicas = 1
 
@@ -32,7 +39,7 @@ resource "kubernetes_deployment" "misarch_inventory" {
           // Source diff: https://github.com/Misarch/inventory (file: src/events/index.ts).
           // Remove this override once upstream merges the fix.
           // image             = "ghcr.io/misarch/inventory:${var.MISARCH_INVENTORY_VERSION}"
-          image = "europe-west1-docker.pkg.dev/misarch/misarch/inventory:cnae-pubsubname-fix"
+          image             = "europe-west1-docker.pkg.dev/misarch/misarch/inventory:cnae-pubsubname-fix"
           image_pull_policy = "Always"
 
           name = local.misarch_inventory_service_name

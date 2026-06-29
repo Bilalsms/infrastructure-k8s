@@ -11,8 +11,8 @@ resource "kubernetes_service" "misarch_gateway" {
     }
 
     port {
-      name       = "http"
-      port       = 8080
+      name        = "http"
+      port        = 8080
       target_port = 8080
     }
   }
