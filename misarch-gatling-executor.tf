@@ -11,8 +11,8 @@ resource "kubernetes_service" "misarch_gatling_executor" {
     }
 
     port {
-      name       = "http"
-      port       = 8889
+      name        = "http"
+      port        = 8889
       target_port = 8889
     }
   }
@@ -37,7 +37,7 @@ resource "kubernetes_deployment" "misarch_gatling_executor" {
 
     template {
       metadata {
-        labels      = merge(local.base_misarch_labels, local.misarch_gatling_executor_specific_labels)
+        labels = merge(local.base_misarch_labels, local.misarch_gatling_executor_specific_labels)
       }
 
       spec {
@@ -50,12 +50,12 @@ resource "kubernetes_deployment" "misarch_gatling_executor" {
 
           resources {
             limits = {
-              cpu    = "5000m"
-              memory = "5Gi"
+              cpu    = "200m"
+              memory = "1024Mi"
             }
             requests = {
-              cpu    = "100m"
-              memory = "500Mi"
+              cpu    = "20m"
+              memory = "576Mi"
             }
           }
 

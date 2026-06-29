@@ -19,7 +19,7 @@ locals {
   misarch_shipment_env_vars_configmap                     = "misarch-shipment-env-vars"
   misarch_shoppingcart_env_vars_configmap                 = "misarch-shoppingcart-env-vars"
   misarch_simulation_env_vars_configmap                   = "misarch-simulation-env-vars"
-  misarch_tax_env_vars_configmap = "misarch-tax-env-vars"
+  misarch_tax_env_vars_configmap                          = "misarch-tax-env-vars"
   misarch_user_env_vars_configmap                         = "misarch-user-env-vars"
   misarch_wishlist_env_vars_configmap                     = "misarch-wishlist-env-vars"
   rabbitmq_env_vars_configmap                             = "rabbitmq-env-vars"
@@ -65,13 +65,17 @@ resource "kubernetes_config_map" "keycloak_env_vars" {
   }
 
   data = {
-    "KC_HOSTNAME_STRICT"     = "false"
-    "KEYCLOAK_EXTRA_ARGS"    = "--import-realm"
+    "KC_HOSTNAME_STRICT"              = "false"
+    "KEYCLOAK_EXTRA_ARGS"             = "--import-realm"
     "QUARKUS_HTTP_ACCESS_LOG_ENABLED" = "true" // for easier debugging, can just as well be deleted
-    "KEYCLOAK_HTTPS_ENABLED" = "false"
-    "KC_HTTP_PORT"           = "8080"
-    "KC_DB_URL"              = "jdbc:postgresql://${local.keycloak_db_url}/keycloak"
-    "KC_DB_PASSWORD"         = random_password.keycloak_db_password.result
+    "KEYCLOAK_HTTPS_ENABLED"          = "false"
+    "KC_HTTP_PORT"                    = "8080"
+    "KC_DB_URL"                       = "jdbc:postgresql://${local.keycloak_db_url}/keycloak"
+    "KC_DB_PASSWORD"                  = random_password.keycloak_db_password.result
+    "KC_PROXY"                        = "edge"
+    "KC_HOSTNAME"                     = "auth.misarch.${local.ingress_base_host}"
+    "KC_HOSTNAME_STRICT_BACKCHANNEL"  = "true"
+    "KC_HTTP_RELATIVE_PATH"           = "/keycloak"
   }
 }
 
@@ -200,8 +204,9 @@ resource "kubernetes_config_map" "misarch_frontend_env_vars" {
 
   data = {
     "GATEWAY_ENDPOINT"  = local.dapr_misarch_gateway_url
-    "KEYCLOAK_ENDPOINT" = "http://${local.keycloak_url}/keycloak"
+    "KEYCLOAK_ENDPOINT" = "https://auth.misarch.${local.ingress_base_host}/keycloak"
     "MINIO_ENDPOINT"    = "http://${local.minio_url}"
+    "SHOP_ORIGIN"       = "https://misarch.${local.ingress_base_host}"
   }
 }
 
@@ -225,8 +230,8 @@ resource "kubernetes_config_map" "misarch_gateway_env_vars" {
   }
 
   data = {
-    "NODE_ENV"                    = "production"
-    "OTEL_EXPORTER_OTLP_ENDPOINT" = "http://${local.otel_collector_url_http}"
+    "NODE_ENV"                      = "production"
+    "OTEL_EXPORTER_OTLP_ENDPOINT"   = "http://${local.otel_collector_url_http}"
     "OTEL_NODE_RESOURCE_DETECTORS"  = "env,host,os"
     "OTEL_SERVICE_NAME"             = "payment"
     "OTEL_SEMCONV_STABILITY_OPT_IN" = "http"
@@ -252,8 +257,12 @@ resource "kubernetes_config_map" "misarch_inventory_env_vars" {
   }
 
   data = {
-    "DATABASE_URI"                = "mongodb://${local.inventory_db_url}"
-    "OTEL_EXPORTER_OTLP_ENDPOINT" = "http://${local.otel_collector_url_http}"
+    # directConnection=true: inventory-db is a single-node replica set (see
+    # dbs-mongodb.tf). Without this, the driver does replica-set topology
+    # discovery on the headless host — which usually works but can transiently
+    # 'not primary' during restart/election. Be explicit.
+    "DATABASE_URI"                  = "mongodb://${local.inventory_db_url}/?directConnection=true"
+    "OTEL_EXPORTER_OTLP_ENDPOINT"   = "http://${local.otel_collector_url_http}"
     "OTEL_NODE_RESOURCE_DETECTORS"  = "env,host,os"
     "OTEL_SERVICE_NAME"             = "payment"
     "OTEL_SEMCONV_STABILITY_OPT_IN" = "http"
@@ -519,15 +528,15 @@ resource "kubernetes_config_map" "misarch_simulation_env_vars" {
   }
 
   data = {
-    RABBITMQ_URL                = "amqp://${local.rabbitmq_url}"
-    PAYMENTS_PER_MINUTE         = var.MISARCH_SIMULATION_PAYMENTS_PER_MINUTE
-    SHIPMENTS_PER_MINUTE        = var.MISARCH_SIMULATION_SHIPMENTS_PER_MINUTE
-    PROCESSING_TIME_SECONDS     = var.MISARCH_SIMULATION_PROCESSING_TIME_SECONDS
-    PAYMENT_URL                 = "http://${local.payment_url}"
-    SHIPMENT_URL                = "http://${local.shipment_url}"
-    OTEL_EXPORTER_OTLP_ENDPOINT = "http://${local.otel_collector_url_http}"
+    RABBITMQ_URL                  = "amqp://${local.rabbitmq_url}"
+    PAYMENTS_PER_MINUTE           = var.MISARCH_SIMULATION_PAYMENTS_PER_MINUTE
+    SHIPMENTS_PER_MINUTE          = var.MISARCH_SIMULATION_SHIPMENTS_PER_MINUTE
+    PROCESSING_TIME_SECONDS       = var.MISARCH_SIMULATION_PROCESSING_TIME_SECONDS
+    PAYMENT_URL                   = "http://${local.payment_url}"
+    SHIPMENT_URL                  = "http://${local.shipment_url}"
+    OTEL_EXPORTER_OTLP_ENDPOINT   = "http://${local.otel_collector_url_http}"
     OTEL_NODE_RESOURCE_DETECTORS  = "env,host,os"
-    OTEL_SERVICE_NAME          = "payment"
+    OTEL_SERVICE_NAME             = "payment"
     OTEL_SEMCONV_STABILITY_OPT_IN = "http"
   }
 }
@@ -663,7 +672,7 @@ resource "kubernetes_config_map" "misarch_experiment_executor_frontend_env_vars"
   }
 
   data = {
-    "BACKEND_URL" = local.global_domain
+    "BACKEND_URL" = "https://${local.ingress_hosts.frontend}"
   }
 }
 

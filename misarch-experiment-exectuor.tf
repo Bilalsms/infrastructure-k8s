@@ -11,8 +11,8 @@ resource "kubernetes_service" "misarch_experiment_executor" {
     }
 
     port {
-      name       = "http"
-      port       = 8888
+      name        = "http"
+      port        = 8888
       target_port = 8888
     }
   }
@@ -37,7 +37,7 @@ resource "kubernetes_deployment" "misarch_experiment_executor" {
 
     template {
       metadata {
-        labels      = merge(local.base_misarch_labels, local.misarch_experiment_executor_specific_labels)
+        labels = merge(local.base_misarch_labels, local.misarch_experiment_executor_specific_labels)
       }
 
       spec {
@@ -50,12 +50,12 @@ resource "kubernetes_deployment" "misarch_experiment_executor" {
 
           resources {
             limits = {
-              cpu    = "2400m"
-              memory = "5Gi"
+              cpu    = "500m"
+              memory = "512Mi"
             }
             requests = {
-              cpu    = "100m"
-              memory = "200Mi"
+              cpu    = "50m"
+              memory = "256Mi"
             }
           }
 

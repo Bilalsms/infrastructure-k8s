@@ -11,8 +11,8 @@ resource "kubernetes_service" "misarch_experiment_config" {
     }
 
     port {
-      name       = "http"
-      port       = 80
+      name        = "http"
+      port        = 80
       target_port = 8080
     }
   }
@@ -52,12 +52,12 @@ resource "kubernetes_deployment" "misarch_experiment_config" {
 
           resources {
             limits = {
-              cpu    = "500m"
-              memory = "1200Mi"
+              cpu    = "300m"
+              memory = "480Mi"
             }
             requests = {
-              cpu    = "100m"
-              memory = "400Mi"
+              cpu    = "130m"
+              memory = "272Mi"
             }
           }
 

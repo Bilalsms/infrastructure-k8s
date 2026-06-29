@@ -1,12 +1,12 @@
 KEYCLOAK_USER_EVENTS_PLUGIN_VERSION = "latest"
 KEYCLOAK_VERSION                    = "latest"
-MINIO_VERSION = "latest"
+MINIO_VERSION                       = "latest"
 MISARCH_ADDRESS_VERSION             = "latest"
-MISARCH_CATALOG_VERSION             = "latest"
+MISARCH_CATALOG_VERSION             = "main"
 MISARCH_DISCOUNT_VERSION            = "latest"
 MISARCH_EXPERIMENT_CONFIG_VERSION   = "latest"
-MISARCH_FRONTEND_VERSION            = "latest"
-MISARCH_GATEWAY_VERSION             = "latest"
+MISARCH_FRONTEND_VERSION            = "main"
+MISARCH_GATEWAY_VERSION             = "main"
 MISARCH_INVENTORY_VERSION           = "latest"
 MISARCH_INVOICE_VERSION             = "latest"
 MISARCH_MEDIA_VERSION               = "main"
@@ -21,8 +21,13 @@ MISARCH_SIMULATION_VERSION          = "latest"
 MISARCH_TAX_VERSION                 = "latest"
 MISARCH_USER_VERSION                = "latest"
 MISARCH_WISHLIST_VERSION            = "latest"
-RABBITMQ_VERSION = "latest"
+RABBITMQ_VERSION                    = "latest"
 
 # GKE-specific override: bump MongoDB resources above Bitnami "micro" preset (384Mi limit)
 # which OOMKills mongod under load. "medium" = 1024Mi req / 1536Mi limit.
 MONGODB_RESOURCE_PRESET = "medium"
+
+GCP_PROJECT = "misarch"
+GCP_REGION  = "europe-west1"
+CERT_ISSUER = "selfsigned-cluster"
+# LETSENCRYPT_EMAIL removed; LE support dropped (nip.io rate-limit risk on reproduction).

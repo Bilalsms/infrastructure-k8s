@@ -11,8 +11,8 @@ resource "kubernetes_service" "misarch_gateway" {
     }
 
     port {
-      name       = "http"
-      port       = 8080
+      name        = "http"
+      port        = 8080
       target_port = 8080
     }
   }
@@ -52,12 +52,12 @@ resource "kubernetes_deployment" "misarch_gateway" {
 
           resources {
             limits = {
-              cpu    = "2400m"
-              memory = "5Gi"
+              cpu    = "1550m"
+              memory = "9600Mi"
             }
             requests = {
-              cpu    = "100m"
-              memory = "200Mi"
+              cpu    = "770m"
+              memory = "5472Mi"
             }
           }
 
@@ -92,12 +92,12 @@ resource "kubernetes_deployment" "misarch_gateway" {
 
           resources {
             limits = {
-              cpu    = "2000m"
-              memory = "2Gi"
+              cpu    = "200m"
+              memory = "256Mi"
             }
             requests = {
               cpu    = "10m"
-              memory = "50Mi"
+              memory = "80Mi"
             }
           }
 

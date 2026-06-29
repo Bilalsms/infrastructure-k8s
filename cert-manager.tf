@@ -1,5 +1,4 @@
 // cert-manager — required by the OpenTelemetry Operator for its mutating-webhook TLS certs.
-// See projects/I_misarch_otel_operator_plan.md, Phase 1.
 
 resource "kubernetes_namespace" "cert_manager" {
   metadata {

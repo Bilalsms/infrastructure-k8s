@@ -18,9 +18,18 @@ resource "helm_release" "redis" {
       - "--save 900 1"
       - "--save 300 10"
       - "--save 60 10000"
+      - "--maxmemory 1500mb"
+      - "--maxmemory-policy allkeys-lru"
     persistence:
       enabled: true
     terminationGracePeriodSeconds: 30
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "2Gi"
 
   replica:
     replicaCount: 0
@@ -125,5 +134,5 @@ resource "kubectl_manifest" "dapr_config" {
 // Pseudo resource so that all services can simply depend on this resource instead of the whole list ↓
 resource "terraform_data" "dapr" {
   depends_on = [helm_release.dapr, kubectl_manifest.dapr_config, kubectl_manifest.dapr_pubsub_config_experiment_config,
-    kubectl_manifest.dapr_pubsub_config, kubectl_manifest.dapr_state_config]
+  kubectl_manifest.dapr_pubsub_config, kubectl_manifest.dapr_state_config]
 }

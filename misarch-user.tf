@@ -32,12 +32,12 @@ resource "kubernetes_deployment" "misarch_user" {
 
           resources {
             limits = {
-              cpu    = "500m"
-              memory = "1200Mi"
+              cpu    = "200m"
+              memory = "1440Mi"
             }
             requests = {
-              cpu    = "100m"
-              memory = "400Mi"
+              cpu    = "20m"
+              memory = "816Mi"
             }
           }
 
@@ -61,12 +61,12 @@ resource "kubernetes_deployment" "misarch_user" {
 
           resources {
             limits = {
-              cpu    = "2000m"
-              memory = "2Gi"
+              cpu    = "200m"
+              memory = "256Mi"
             }
             requests = {
               cpu    = "10m"
-              memory = "50Mi"
+              memory = "80Mi"
             }
           }
 

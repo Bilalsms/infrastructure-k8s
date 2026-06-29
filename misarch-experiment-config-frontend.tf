@@ -2,7 +2,7 @@ resource "kubernetes_service" "misarch_experiment_config_frontend" {
   metadata {
     name      = "misarch-experiment-config-frontend"
     namespace = local.namespace
-    labels = merge(local.base_misarch_labels, { app = "misarch-experiment-config-frontend" })
+    labels    = merge(local.base_misarch_labels, { app = "misarch-experiment-config-frontend" })
   }
 
   spec {
@@ -21,7 +21,7 @@ resource "kubernetes_deployment" "misarch_experiment_config_frontend" {
   metadata {
 
     name      = "misarch-experiment-config-frontend"
-    labels = merge(local.base_misarch_labels, { app = "misarch-experiment-config-frontend" })
+    labels    = merge(local.base_misarch_labels, { app = "misarch-experiment-config-frontend" })
     namespace = local.namespace
   }
 
@@ -36,7 +36,7 @@ resource "kubernetes_deployment" "misarch_experiment_config_frontend" {
 
     template {
       metadata {
-        labels = merge(local.base_misarch_labels, { app = "misarch-experiment-config-frontend" })
+        labels      = merge(local.base_misarch_labels, { app = "misarch-experiment-config-frontend" })
         annotations = merge(local.base_misarch_annotations, { "dapr.io/enabled" = "false" })
       }
 
@@ -50,12 +50,12 @@ resource "kubernetes_deployment" "misarch_experiment_config_frontend" {
 
           resources {
             limits = {
-              cpu    = "100m"
-              memory = "100Mi"
+              cpu    = "200m"
+              memory = "256Mi"
             }
             requests = {
-              cpu    = "40m"
-              memory = "50Mi"
+              cpu    = "20m"
+              memory = "96Mi"
             }
           }
 

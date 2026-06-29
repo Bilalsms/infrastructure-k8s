@@ -1,0 +1,563 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Sum of irate over kepler_container_joules_total for misarch namespace. This is the headline measurement number \u2014 annotate S0/S1/S2 boundaries on screenshots.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineWidth": 2,
+            "pointSize": 4,
+            "showPoints": "never",
+            "spanNulls": true
+          },
+          "unit": "watt"
+        }
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(irate(kepler_container_joules_total{container_namespace=\"misarch\",pod_name=~\"misarch-.*|keycloak.*|redis.*\"}[1m]))",
+          "legendFormat": "Total misarch (W)",
+          "refId": "A"
+        }
+      ],
+      "title": "Total misarch power (W)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Per-pod power, stacked. Reveals which services scale with load (hot path) and which sit flat regardless of traffic (dark-idle = KEDA scale-to-zero candidates).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 70,
+            "lineWidth": 1,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          },
+          "unit": "watt"
+        }
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 14,
+        "x": 0,
+        "y": 9
+      },
+      "id": 2,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (pod_name) (irate(kepler_container_joules_total{container_namespace=\"misarch\",pod_name=~\"misarch-.*|keycloak.*|redis.*\"}[1m]))",
+          "legendFormat": "{{pod_name}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Power per pod (W) \u2014 stacked",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Average power per pod across the dashboard time range. Ranked descending. Pods with similar values at idle (S0) and peak (S2) are dark-idle candidates for scale-to-zero.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "displayMode": "color-background"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "orange",
+                "value": 3
+              },
+              {
+                "color": "red",
+                "value": 6
+              }
+            ]
+          },
+          "unit": "watt"
+        }
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 10,
+        "x": 14,
+        "y": 9
+      },
+      "id": 3,
+      "options": {
+        "showHeader": true,
+        "sortBy": [
+          {
+            "displayName": "Value",
+            "desc": true
+          }
+        ]
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "avg_over_time(sum by (pod_name) (irate(kepler_container_joules_total{container_namespace=\"misarch\",pod_name=~\"misarch-.*|keycloak.*|redis.*\"}[1m]))[$__range:30s])",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Avg power per pod over range (ranked)",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Value": "Power (W)",
+              "pod_name": "Pod"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Total energy consumed by the misarch namespace across the dashboard time range, converted to gCO\u2082eq using the German grid average (350 gCO\u2082eq/kWh, UBA 2024). Use this as the single-number deliverable for the report.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          },
+          "unit": "mass-g"
+        }
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 19
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(increase(kepler_container_joules_total{container_namespace=\"misarch\",pod_name=~\"misarch-.*|keycloak.*|redis.*\"}[$__range])) * 0.000000277777777777778 * ${carbon_intensity_de}",
+          "refId": "A"
+        }
+      ],
+      "title": "Carbon (gCO\u2082eq) \u2014 DE grid",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Same calculation against the EU-average grid intensity (250 gCO\u2082eq/kWh, EEA 2024).",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          },
+          "unit": "mass-g"
+        }
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 19
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(increase(kepler_container_joules_total{container_namespace=\"misarch\",pod_name=~\"misarch-.*|keycloak.*|redis.*\"}[$__range])) * 0.000000277777777777778 * ${carbon_intensity_eu}",
+          "refId": "A"
+        }
+      ],
+      "title": "Carbon (gCO\u2082eq) \u2014 EU grid",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Total energy in kWh across the dashboard time range.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "kwatth",
+          "decimals": 4
+        }
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 19
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(increase(kepler_container_joules_total{container_namespace=\"misarch\",pod_name=~\"misarch-.*|keycloak.*|redis.*\"}[$__range])) * 0.000000277777777777778",
+          "refId": "A"
+        }
+      ],
+      "title": "Total energy (kWh)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "description": "Breaks the misarch namespace power into 'application' (misarch-*, keycloak, redis) vs 'infrastructure' (databases, Dapr control plane, Prometheus/Grafana/Kepler, MinIO, RabbitMQ, OTel, etc.). The infra baseline is what's left after KEDA scale-to-zero on the app side \u2014 it sets the floor on how much energy you can possibly save.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 60,
+            "lineWidth": 2,
+            "showPoints": "never",
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          },
+          "unit": "watt"
+        }
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true,
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(irate(kepler_container_joules_total{container_namespace=\"misarch\",pod_name=~\"misarch-.*|keycloak.*|redis.*\"}[1m]))",
+          "legendFormat": "Application",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(irate(kepler_container_joules_total{container_namespace=\"misarch\"}[1m])) - sum(irate(kepler_container_joules_total{container_namespace=\"misarch\",pod_name=~\"misarch-.*|keycloak.*|redis.*\"}[1m]))",
+          "legendFormat": "Infrastructure (DBs, Dapr, Prometheus, etc.)",
+          "refId": "B"
+        }
+      ],
+      "title": "Application vs Infrastructure power (W)",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "",
+  "schemaVersion": 38,
+  "style": "dark",
+  "tags": [
+    "cnae",
+    "energy",
+    "misarch"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "Prometheus",
+          "value": "prometheus"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "label": "Datasource",
+        "multi": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "0.350",
+          "value": "0.350"
+        },
+        "description": "German grid carbon intensity (kgCO\u2082eq/kWh). Default 0.350 \u2014 UBA 2024.",
+        "hide": 0,
+        "label": "DE gCO\u2082/Wh",
+        "name": "carbon_intensity_de",
+        "options": [
+          {
+            "selected": true,
+            "text": "0.350",
+            "value": "0.350"
+          }
+        ],
+        "query": "0.350",
+        "skipUrlSync": false,
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "0.250",
+          "value": "0.250"
+        },
+        "description": "EU-average grid carbon intensity (kgCO\u2082eq/kWh). Default 0.250 \u2014 EEA 2024.",
+        "hide": 0,
+        "label": "EU gCO\u2082/Wh",
+        "name": "carbon_intensity_eu",
+        "options": [
+          {
+            "selected": true,
+            "text": "0.250",
+            "value": "0.250"
+          }
+        ],
+        "query": "0.250",
+        "skipUrlSync": false,
+        "type": "textbox"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "CNAE \u2014 MiSArch Energy",
+  "uid": "cnae-misarch-energy",
+  "version": 2,
+  "weekStart": ""
+}

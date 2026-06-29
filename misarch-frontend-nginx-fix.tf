@@ -1,0 +1,61 @@
+resource "kubernetes_config_map" "misarch_frontend_nginx_template" {
+  metadata {
+    name      = "misarch-frontend-nginx-template"
+    namespace = local.namespace
+  }
+
+  data = {
+    "default.conf.template" = <<-EOT
+      proxy_buffer_size   128k;
+      proxy_buffers   4 256k;
+      proxy_busy_buffers_size   256k;
+
+      server {
+          listen 80;
+
+          # Root directory
+          location / {
+              root   /usr/share/nginx/html;
+              try_files $uri $uri/ /index.html;
+          }
+
+          location /assets/ {
+              root /usr/share/nginx/html;
+              sub_filter_types application/javascript;
+              sub_filter_once off;
+              sub_filter 'url:"/keycloak"' 'url:"$${KEYCLOAK_ENDPOINT}"';
+              sub_filter '"/assets/silent-check-sso-' '"$${SHOP_ORIGIN}/assets/silent-check-sso-';
+              sub_filter 'redirectUri:"/"' 'redirectUri:"$${SHOP_ORIGIN}/"';
+          }
+
+          # Proxy /api/graphql
+          location /api/graphql {
+              proxy_pass $${GATEWAY_ENDPOINT};
+              proxy_http_version 1.1;
+              proxy_set_header Upgrade $http_upgrade;
+              proxy_set_header Connection "upgrade";
+              proxy_set_header Host $host;
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+              proxy_set_header X-Forwarded-Host $host;
+          }
+
+          # Proxy /api/media
+          location /api/media {
+              rewrite ^/api/media/(.*) /$1 break;
+              proxy_set_header Host $proxy_host;
+              proxy_set_header X-Real-IP $remote_addr;
+              proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+              proxy_set_header X-Forwarded-Proto $scheme;
+              proxy_connect_timeout 300;
+              # Default is HTTP/1, keepalive is only enabled in HTTP/1.1
+              proxy_http_version 1.1;
+              proxy_set_header Connection ""; # Required by MinIO
+              chunked_transfer_encoding off;
+              proxy_pass $${MINIO_ENDPOINT};
+          }
+      }
+    EOT
+  }
+}
