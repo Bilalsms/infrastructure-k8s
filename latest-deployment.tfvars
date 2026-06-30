@@ -1,7 +1,7 @@
 KEYCLOAK_USER_EVENTS_PLUGIN_VERSION = "latest"
 KEYCLOAK_VERSION                    = "latest"
 MINIO_VERSION                       = "latest"
-MISARCH_ADDRESS_VERSION             = "latest"
+MISARCH_ADDRESS_VERSION             = "main"
 MISARCH_CATALOG_VERSION             = "main"
 MISARCH_DISCOUNT_VERSION            = "latest"
 MISARCH_EXPERIMENT_CONFIG_VERSION   = "latest"
