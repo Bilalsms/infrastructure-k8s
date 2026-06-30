@@ -108,10 +108,10 @@ resource "kubernetes_config_map" "misarch_address_env_vars" {
   }
 
   data = {
-    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.address_db_url}/${var.MISARCH_DB_DATABASE}"
-    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.address_db_url}/${var.MISARCH_DB_DATABASE}"
+    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.address_db_url}/${local.pg_shared_databases.address}"
+    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.address_db_url}/${local.pg_shared_databases.address}"
     "SPRING_R2DBC_USERNAME"                                        = var.MISARCH_DB_USER
-    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_address_db_password.result
+    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_pg_shared_app_password.result
     "OTEL_EXPORTER_OTLP_ENDPOINT"                                  = "http://${local.otel_collector_url_http}"
     "OTEL_INSTRUMENTATION_HTTP_SERVER_EMIT_EXPERIMENTAL_TELEMETRY" = true
   }
@@ -136,10 +136,10 @@ resource "kubernetes_config_map" "misarch_catalog_env_vars" {
   }
 
   data = {
-    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.catalog_db_url}/${var.MISARCH_DB_DATABASE}"
-    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.catalog_db_url}/${var.MISARCH_DB_DATABASE}"
+    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.catalog_db_url}/${local.pg_shared_databases.catalog}"
+    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.catalog_db_url}/${local.pg_shared_databases.catalog}"
     "SPRING_R2DBC_USERNAME"                                        = var.MISARCH_DB_USER
-    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_catalog_db_password.result
+    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_pg_shared_app_password.result
     "OTEL_EXPORTER_OTLP_ENDPOINT"                                  = "http://${local.otel_collector_url_http}"
     "OTEL_INSTRUMENTATION_HTTP_SERVER_EMIT_EXPERIMENTAL_TELEMETRY" = true
   }
@@ -165,10 +165,10 @@ resource "kubernetes_config_map" "misarch_discount_env_vars" {
   }
 
   data = {
-    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.discount_db_url}/${var.MISARCH_DB_DATABASE}"
-    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.discount_db_url}/${var.MISARCH_DB_DATABASE}"
+    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.discount_db_url}/${local.pg_shared_databases.discount}"
+    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.discount_db_url}/${local.pg_shared_databases.discount}"
     "SPRING_R2DBC_USERNAME"                                        = var.MISARCH_DB_USER
-    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_discount_db_password.result
+    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_pg_shared_app_password.result
     "OTEL_EXPORTER_OTLP_ENDPOINT"                                  = "http://${local.otel_collector_url_http}"
     "OTEL_INSTRUMENTATION_HTTP_SERVER_EMIT_EXPERIMENTAL_TELEMETRY" = true
   }
@@ -338,10 +338,10 @@ resource "kubernetes_config_map" "misarch_notification_env_vars" {
   }
 
   data = {
-    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.notification_db_url}/${var.MISARCH_DB_DATABASE}"
-    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.notification_db_url}/${var.MISARCH_DB_DATABASE}"
+    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.notification_db_url}/${local.pg_shared_databases.notification}"
+    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.notification_db_url}/${local.pg_shared_databases.notification}"
     "SPRING_R2DBC_USERNAME"                                        = var.MISARCH_DB_USER
-    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_notification_db_password.result
+    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_pg_shared_app_password.result
     "OTEL_EXPORTER_OTLP_ENDPOINT"                                  = "http://${local.otel_collector_url_http}"
     "OTEL_INSTRUMENTATION_HTTP_SERVER_EMIT_EXPERIMENTAL_TELEMETRY" = true
   }
@@ -446,10 +446,10 @@ resource "kubernetes_config_map" "misarch_return_env_vars" {
   }
 
   data = {
-    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.return_db_url}/${var.MISARCH_DB_DATABASE}"
-    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.return_db_url}/${var.MISARCH_DB_DATABASE}"
+    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.return_db_url}/${local.pg_shared_databases.return}"
+    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.return_db_url}/${local.pg_shared_databases.return}"
     "SPRING_R2DBC_USERNAME"                                        = var.MISARCH_DB_USER
-    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_return_db_password.result
+    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_pg_shared_app_password.result
     "OTEL_EXPORTER_OTLP_ENDPOINT"                                  = "http://${local.otel_collector_url_http}"
     "OTEL_INSTRUMENTATION_HTTP_SERVER_EMIT_EXPERIMENTAL_TELEMETRY" = true
   }
@@ -474,10 +474,10 @@ resource "kubernetes_config_map" "misarch_shipment_env_vars" {
   }
 
   data = {
-    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.shipment_db_url}/${var.MISARCH_DB_DATABASE}"
-    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.shipment_db_url}/${var.MISARCH_DB_DATABASE}"
+    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.shipment_db_url}/${local.pg_shared_databases.shipment}"
+    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.shipment_db_url}/${local.pg_shared_databases.shipment}"
     "SPRING_R2DBC_USERNAME"                                        = var.MISARCH_DB_USER
-    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_shipment_db_password.result
+    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_pg_shared_app_password.result
     "MISARCH_SHIPMENT_PROVIDER_ENDPOINT"                           = "http://${local.simulation_url}/shipment/register"
     "OTEL_EXPORTER_OTLP_ENDPOINT"                                  = "http://${local.otel_collector_url_http}"
     "OTEL_INSTRUMENTATION_HTTP_SERVER_EMIT_EXPERIMENTAL_TELEMETRY" = true
@@ -560,10 +560,10 @@ resource "kubernetes_config_map" "misarch_tax_env_vars" {
   }
 
   data = {
-    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.tax_db_url}/${var.MISARCH_DB_DATABASE}"
-    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.tax_db_url}/${var.MISARCH_DB_DATABASE}"
+    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.tax_db_url}/${local.pg_shared_databases.tax}"
+    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.tax_db_url}/${local.pg_shared_databases.tax}"
     "SPRING_R2DBC_USERNAME"                                        = var.MISARCH_DB_USER
-    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_tax_db_password.result
+    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_pg_shared_app_password.result
     "OTEL_EXPORTER_OTLP_ENDPOINT"                                  = "http://${local.otel_collector_url_http}"
     "OTEL_INSTRUMENTATION_HTTP_SERVER_EMIT_EXPERIMENTAL_TELEMETRY" = true
   }
@@ -588,10 +588,10 @@ resource "kubernetes_config_map" "misarch_user_env_vars" {
   }
 
   data = {
-    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.user_db_url}/${var.MISARCH_DB_DATABASE}"
-    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.user_db_url}/${var.MISARCH_DB_DATABASE}"
+    "SPRING_R2DBC_URL"                                             = "r2dbc:postgresql://${local.user_db_url}/${local.pg_shared_databases.user}"
+    "SPRING_FLYWAY_URL"                                            = "jdbc:postgresql://${local.user_db_url}/${local.pg_shared_databases.user}"
     "SPRING_R2DBC_USERNAME"                                        = var.MISARCH_DB_USER
-    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_user_db_password.result
+    "SPRING_R2DBC_PASSWORD"                                        = random_password.misarch_pg_shared_app_password.result
     "OTEL_EXPORTER_OTLP_ENDPOINT"                                  = "http://${local.otel_collector_url_http}"
     "OTEL_INSTRUMENTATION_HTTP_SERVER_EMIT_EXPERIMENTAL_TELEMETRY" = true
   }

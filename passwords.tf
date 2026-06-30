@@ -14,20 +14,20 @@ resource "random_password" "prometheus_basic_auth_password" {
   special = false
 }
 
-resource "random_password" "misarch_address_db_password" {
+// Shared Postgres for the 8 misarch Spring services (path 3 consolidation).
+// One root password (rotated by random_password) + one app user password.
+// All 8 services connect with the same app credentials to per-service DBs.
+resource "random_password" "misarch_pg_shared_root_password" {
+  length  = 32
+  special = false
+}
+resource "random_password" "misarch_pg_shared_app_password" {
   length  = 32
   special = false
 }
 
-resource "random_password" "misarch_catalog_db_password" {
-  length  = 32
-  special = false
-}
 
-resource "random_password" "misarch_discount_db_password" {
-  length  = 32
-  special = false
-}
+
 
 resource "random_password" "misarch_inventory_db_password" {
   length  = 32
@@ -44,10 +44,6 @@ resource "random_password" "misarch_media_db_password" {
   special = false
 }
 
-resource "random_password" "misarch_notification_db_password" {
-  length  = 32
-  special = false
-}
 
 resource "random_password" "misarch_order_db_password" {
   length  = 32
@@ -64,75 +60,27 @@ resource "random_password" "misarch_review_db_password" {
   special = false
 }
 
-resource "random_password" "misarch_return_db_password" {
-  length  = 32
-  special = false
-}
 
-resource "random_password" "misarch_shipment_db_password" {
-  length  = 32
-  special = false
-}
 
 resource "random_password" "misarch_shoppingcart_db_password" {
   length  = 32
   special = false
 }
 
-resource "random_password" "misarch_tax_db_password" {
-  length  = 32
-  special = false
-}
 
-resource "random_password" "misarch_user_db_password" {
-  length  = 32
-  special = false
-}
 
 resource "random_password" "misarch_wishlist_db_password" {
   length  = 32
   special = false
 }
 
-resource "random_password" "postgres_address_db_password" {
-  length  = 32
-  special = false
-}
 
-resource "random_password" "postgres_catalog_db_password" {
-  length  = 32
-  special = false
-}
 
-resource "random_password" "postgres_discount_db_password" {
-  length  = 32
-  special = false
-}
 
-resource "random_password" "postgres_notification_db_password" {
-  length  = 32
-  special = false
-}
 
-resource "random_password" "postgres_return_db_password" {
-  length  = 32
-  special = false
-}
 
-resource "random_password" "postgres_shipment_db_password" {
-  length  = 32
-  special = false
-}
 
-resource "random_password" "postgres_tax_db_password" {
-  length  = 32
-  special = false
-}
 
-resource "random_password" "postgres_user_db_password" {
-  length  = 32
-  special = false
-}
 
 resource "random_password" "postgres_keycloak_db_password" {
   length  = 32
@@ -167,25 +115,23 @@ output "prometheus_basic_auth_password" {
   sensitive = true
 }
 
+output "misarch_pg_shared_root_password" {
+  value     = random_password.misarch_pg_shared_root_password.result
+  sensitive = true
+}
+
+output "misarch_pg_shared_app_password" {
+  value     = random_password.misarch_pg_shared_app_password.result
+  sensitive = true
+}
+
 output "minio_admin_password" {
   value     = random_password.minio_admin_password.result
   sensitive = true
 }
 
-output "misarch_address_db_password" {
-  value     = random_password.misarch_address_db_password.result
-  sensitive = true
-}
 
-output "misarch_catalog_db_password" {
-  value     = random_password.misarch_catalog_db_password.result
-  sensitive = true
-}
 
-output "misarch_discount_db_password" {
-  value     = random_password.misarch_discount_db_password.result
-  sensitive = true
-}
 
 output "misarch_inventory_db_password" {
   value     = random_password.misarch_inventory_db_password.result
@@ -202,10 +148,6 @@ output "misarch_media_db_password" {
   sensitive = true
 }
 
-output "misarch_notification_db_password" {
-  value     = random_password.misarch_notification_db_password.result
-  sensitive = true
-}
 
 output "misarch_order_db_password" {
   value     = random_password.misarch_order_db_password.result
@@ -222,75 +164,27 @@ output "misarch_review_db_password" {
   sensitive = true
 }
 
-output "misarch_return_db_password" {
-  value     = random_password.misarch_return_db_password.result
-  sensitive = true
-}
 
-output "misarch_shipment_db_password" {
-  value     = random_password.misarch_shipment_db_password.result
-  sensitive = true
-}
 
 output "misarch_shoppingcart_db_password" {
   value     = random_password.misarch_shoppingcart_db_password.result
   sensitive = true
 }
 
-output "misarch_tax_db_password" {
-  value     = random_password.misarch_tax_db_password.result
-  sensitive = true
-}
 
-output "misarch_user_db_password" {
-  value     = random_password.misarch_user_db_password.result
-  sensitive = true
-}
 
 output "misarch_wishlist_db_password" {
   value     = random_password.misarch_wishlist_db_password.result
   sensitive = true
 }
 
-output "postgres_address_db_password" {
-  value     = random_password.postgres_address_db_password.result
-  sensitive = true
-}
 
-output "postgres_catalog_db_password" {
-  value     = random_password.postgres_catalog_db_password.result
-  sensitive = true
-}
 
-output "postgres_discount_db_password" {
-  value     = random_password.postgres_discount_db_password.result
-  sensitive = true
-}
 
-output "postgres_notification_db_password" {
-  value     = random_password.postgres_notification_db_password.result
-  sensitive = true
-}
 
-output "postgres_return_db_password" {
-  value     = random_password.postgres_return_db_password.result
-  sensitive = true
-}
 
-output "postgres_shipment_db_password" {
-  value     = random_password.postgres_shipment_db_password.result
-  sensitive = true
-}
 
-output "postgres_tax_db_password" {
-  value     = random_password.postgres_tax_db_password.result
-  sensitive = true
-}
 
-output "postgres_user_db_password" {
-  value     = random_password.postgres_user_db_password.result
-  sensitive = true
-}
 
 output "postgres_keycloak_db_password" {
   value     = random_password.postgres_keycloak_db_password.result
