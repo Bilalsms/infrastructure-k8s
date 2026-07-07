@@ -8,6 +8,15 @@ resource "helm_release" "prometheus_grafana_stack" {
     <<-EOF
   prometheus:
     prometheusSpec:
+      retention: 20d
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            storageClassName: standard-rwo   # GKE default class
+            resources:
+              requests:
+                storage: 20Gi
       additionalScrapeConfigs:
         - job_name: 'otel-collector'
           scrape_interval: 5s
@@ -16,6 +25,21 @@ resource "helm_release" "prometheus_grafana_stack" {
 
   grafana:
     enabled: true
+    imageRenderer:
+      enabled: true
+      replicas: 1
+      resources:
+        requests:
+          cpu: "50m"
+          memory: "100Mi"
+        limits:
+          cpu: "500m"
+          memory: "400Mi"
+    grafana.ini:
+      rendering:
+        server_url: http://prometheus-stack-grafana-image-renderer.${local.namespace}.svc.cluster.local:8081/render
+        callback_url: http://prometheus-stack-grafana.${local.namespace}.svc.cluster.local/
+        concurrent_render_request_limit: 5
     datasources:
       datasources.yaml:
         apiVersion: 1
