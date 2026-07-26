@@ -10,13 +10,14 @@
 > (`infrastructure-k8s`) unless the snippet says otherwise. Sibling repos are
 > assumed cloned alongside it, e.g. `../inventory`, `../gateway`, `../load-tests`.
 
-## Repositories
+## Repositories & artefacts
 
-| Repo | URL | Contains |
+| Artefact | Link | Contains |
 |---|---|---|
 | `infrastructure-k8s` | https://github.com/Bilalsms/infrastructure-k8s | Terraform for all in-cluster resources, seed scripts, dashboards. **Start here.** |
 | `gateway` | https://github.com/Bilalsms/gateway | Gateway-Optimized source: JWT-verification cache, HTTP-only OTel, playground off |
 | `inventory` | https://github.com/Bilalsms/inventory | `pubSubName` Dapr subscription fix |
+| **Reproduction video** | https://drive.google.com/file/d/14Z8roAfmdfW_6zp84egBu9BeDZWKFpEH/view?usp=share_link | Screen recording of the full deployment, a working checkout scenario, and the refactor with its energy measurement |
 
 Each repo carries a `vanilla` branch (baseline) and `main` (refactored).
 
@@ -636,7 +637,14 @@ timestamps and are always correct regardless.
 
 ---
 
-## 6a. Reproduction video — recording checklist
+## 6a. Reproduction video
+
+**Recorded video:**
+<https://drive.google.com/file/d/14Z8roAfmdfW_6zp84egBu9BeDZWKFpEH/view?usp=share_link>
+
+The checklist below is what that recording follows; keep it for re-recording.
+
+### Recording checklist
 
 The submitted video must be **≤ 5 minutes, uncut** (speed up long waits, do
 not edit out steps) and must show *deploy → a basic working scenario → the
