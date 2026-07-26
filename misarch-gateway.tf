@@ -45,7 +45,14 @@ resource "kubernetes_deployment" "misarch_gateway" {
       spec {
 
         container {
-          image             = "ghcr.io/misarch/gateway:${var.MISARCH_GATEWAY_VERSION}"
+          // Gateway refactor:
+          //   * response cache plugin (envelopPlugins.ts)
+          //   * JWT verification cache (envelopPlugins.ts)
+          //   * OTel auto → http-only (otlp.js)
+          //   * playground disabled (.meshrc.yaml)
+          // Custom image; revert to ghcr.io upstream by changing tag back.
+          // image             = "ghcr.io/misarch/gateway:${var.MISARCH_GATEWAY_VERSION}"
+          image             = "europe-west1-docker.pkg.dev/misarch/misarch/gateway:cnae-gateway-slim"
           image_pull_policy = "Always"
 
           name = local.misarch_gateway_service_name
@@ -59,6 +66,13 @@ resource "kubernetes_deployment" "misarch_gateway" {
               cpu    = "770m"
               memory = "5472Mi"
             }
+          }
+
+          // Gateway: cap V8 old-gen heap to 512 MiB. Without this,
+          // V8 sizes itself against the cgroup limit (9.6 GiB) and runs longer,
+          env {
+            name  = "NODE_OPTIONS"
+            value = "--max-old-space-size=512"
           }
 
           readiness_probe {
