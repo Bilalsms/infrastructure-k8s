@@ -10,13 +10,14 @@
 > (`infrastructure-k8s`) unless the snippet says otherwise. Sibling repos are
 > assumed cloned alongside it, e.g. `../inventory`, `../gateway`, `../load-tests`.
 
-## Repositories
+## Repositories & artefacts
 
-| Repo | URL | Contains |
+| Artefact | Link | Contains |
 |---|---|---|
 | `infrastructure-k8s` | https://github.com/Bilalsms/infrastructure-k8s | Terraform for all in-cluster resources, seed scripts, dashboards. **Start here.** |
 | `gateway` | https://github.com/Bilalsms/gateway | Gateway-Optimized source: JWT-verification cache, HTTP-only OTel, playground off |
 | `inventory` | https://github.com/Bilalsms/inventory | `pubSubName` Dapr subscription fix |
+| **Reproduction video** | https://drive.google.com/file/d/14Z8roAfmdfW_6zp84egBu9BeDZWKFpEH/view?usp=share_link | Screen recording of the full deployment, a working checkout scenario, and the refactor with its energy measurement |
 
 Each repo carries a `vanilla` branch (baseline) and `main` (refactored).
 
@@ -137,13 +138,43 @@ gcloud container clusters update misarch \
 
 ## 2. Bootstrap Terraform
 
+### Point Terraform at your kubeconfig (do this first, every shell)
+
+```bash
+export TF_VAR_KUBERNETES_CONFIG_PATH="$HOME/.kube/config"
+```
+
+`TF_VAR_<NAME>` is how Terraform reads an input variable from the environment.
+This one sets `var.KUBERNETES_CONFIG_PATH`, which `main.tf` hands to all three
+providers (`kubernetes`, `helm`, `kubectl`) as `config_path` — it is how
+Terraform knows which cluster to talk to. Set it in **every new shell** before
+running `terraform`, or add it to your shell profile.
+
+> **Why the default is not enough.** `variables-misc.tf` defaults to
+> `"~/.kube/config"`, but Terraform does **not** expand `~` — it passes the
+> literal string, the providers cannot find the file, and Terraform silently
+> reports **`Nothing to do. 0 resources to add, change or destroy`** instead of
+> failing. If you ever see an empty plan against a cluster you know is running,
+> this export is almost always the reason. `$HOME` expands in the shell, which
+> is why the form above works.
+
+Do not confuse this with the `gcloud` command in §1: that one *creates* the
+kubeconfig, this one tells Terraform where it is.
+
+```bash
+gcloud container clusters get-credentials misarch --zone=europe-west1-b  # writes ~/.kube/config
+export TF_VAR_KUBERNETES_CONFIG_PATH="$HOME/.kube/config"                # Terraform reads it
+```
+
+### Apply
+
 ```bash
 # Copy or create your tfvars from the latest-deployment.tfvars template
 cp latest-deployment.tfvars.example latest-deployment.tfvars   # if present
-# Edit: GCP_PROJECT, KUBERNETES_CONFIG_PATH, MISARCH_INGRESS_BASE_HOST, image tags
+# Edit: GCP_PROJECT, MISARCH_INGRESS_BASE_HOST, image tags
 
 terraform init
-terraform apply -auto-approve -var-file=latest-deployment.tfvars
+terraform apply -var-file=latest-deployment.tfvars
 ```
 
 This will provision (in order):
@@ -606,7 +637,14 @@ timestamps and are always correct regardless.
 
 ---
 
-## 6a. Reproduction video — recording checklist
+## 6a. Reproduction video
+
+**Recorded video:**
+<https://drive.google.com/file/d/14Z8roAfmdfW_6zp84egBu9BeDZWKFpEH/view?usp=share_link>
+
+The checklist below is what that recording follows; keep it for re-recording.
+
+### Recording checklist
 
 The submitted video must be **≤ 5 minutes, uncut** (speed up long waits, do
 not edit out steps) and must show *deploy → a basic working scenario → the
@@ -636,19 +674,6 @@ sequence; the bracketed items are the ones a grader must actually see happen.
    - Kick off `./run-baseline.sh` (or open the pre-recorded run dir) and show
      the Grafana **CNAE energy dashboard** with per-pod Watts / CO₂e panel.
      **[gateway pod power lower under load vs. the vanilla panel]**
-
-**Why this order:** it mirrors the three things the email asks the video to
-prove — that the system deploys, that it runs, and that the refactor is real
-and has the claimed effect — in the shortest path that shows each without
-cuts. Do a dry run first; a full deploy exceeds 5 min, so pre-stage the
-cluster and screen-record only the `apply` + verification, then splice in a
-sped-up capture of the settling wait.
-
-**Before you hit record:** accept all five self-signed certificates (§2b) in the
-browser profile you are recording with. Otherwise the storefront will load
-empty on camera and the take is wasted. Also run the Dapr audit (issue 4)
-so the mesh is healthy before the first shot.
-
 ---
 
 ## 7. Cluster shutdown / restart (cost saving)

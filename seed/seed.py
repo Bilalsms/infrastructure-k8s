@@ -38,6 +38,9 @@ KC_ADMIN_PW   = os.environ.get("KEYCLOAK_ADMIN_PASSWORD")
 REALM         = os.environ.get("MISARCH_REALM", "Misarch")
 SEED_USER     = os.environ.get("SEED_USER",     "seeder")
 SEED_PW       = os.environ.get("SEED_PASSWORD", "Seeder!2026")
+# Storefront buyer account — used for manual login, seed_checkout.py and k6.
+TEST_USER     = os.environ.get("TEST_USER",     "test")
+TEST_PW       = os.environ.get("TEST_PASSWORD", "test")
 LOREMFLICKR_BASE = "https://loremflickr.com/800/800"  # /<tag1>,<tag2> for topical images
 
 http = requests.Session()
@@ -59,12 +62,18 @@ def kc_master_token() -> str:
     return r.json()["access_token"]
 
 
-def ensure_seed_user(admin_tok: str) -> None:
+def ensure_user(admin_tok: str, username: str, password: str,
+                role: str, first: str, last: str) -> str:
+    """Create (or reuse) a realm user and ensure it holds `role`. Returns its id.
+
+    Idempotent. Also re-asserts the password on an existing user, so a account
+    left over from an earlier run with a different password still works.
+    """
     h = {"Authorization": f"Bearer {admin_tok}"}
 
     r = http.get(
         f"{KC_URL}/admin/realms/{REALM}/users",
-        params={"username": SEED_USER, "exact": "true"},
+        params={"username": username, "exact": "true"},
         headers=h,
     )
     r.raise_for_status()
@@ -72,37 +81,61 @@ def ensure_seed_user(admin_tok: str) -> None:
 
     if users:
         uid = users[0]["id"]
-        print(f"keycloak: reusing user {SEED_USER} ({uid})")
+        print(f"keycloak: reusing user {username} ({uid})")
+        # Re-assert the password — the account may predate a password change.
+        r = http.put(
+            f"{KC_URL}/admin/realms/{REALM}/users/{uid}/reset-password",
+            headers=h,
+            json={"type": "password", "value": password, "temporary": False},
+        )
+        r.raise_for_status()
     else:
         r = http.post(
             f"{KC_URL}/admin/realms/{REALM}/users",
             headers=h,
             json={
-                "username": SEED_USER,
-                "email":    f"{SEED_USER}@example.local",
-                "firstName": "Seed",
-                "lastName":  "Bot",
+                "username": username,
+                "email":    f"{username}@example.local",
+                "firstName": first,
+                "lastName":  last,
                 "enabled":   True,
                 "emailVerified": True,
                 "credentials": [
-                    {"type": "password", "value": SEED_PW, "temporary": False},
+                    {"type": "password", "value": password, "temporary": False},
                 ],
             },
         )
         r.raise_for_status()
         uid = r.headers["Location"].rsplit("/", 1)[-1]
-        print(f"keycloak: created user {SEED_USER} ({uid})")
+        print(f"keycloak: created user {username} ({uid})")
 
-    r = http.get(f"{KC_URL}/admin/realms/{REALM}/roles/admin", headers=h)
+    r = http.get(f"{KC_URL}/admin/realms/{REALM}/roles/{role}", headers=h)
     r.raise_for_status()
-    role = r.json()
+    role_obj = r.json()
     r = http.post(
         f"{KC_URL}/admin/realms/{REALM}/users/{uid}/role-mappings/realm",
         headers=h,
-        json=[{"id": role["id"], "name": role["name"]}],
+        json=[{"id": role_obj["id"], "name": role_obj["name"]}],
     )
     r.raise_for_status()
-    print(f"keycloak: ensured realm role 'admin' on {SEED_USER}")
+    print(f"keycloak: ensured realm role {role!r} on {username}")
+    return uid
+
+
+def ensure_seed_user(admin_tok: str) -> None:
+    """Admin-capable account used by the seeders themselves."""
+    ensure_user(admin_tok, SEED_USER, SEED_PW, "admin", "Seed", "Bot")
+
+
+def ensure_test_user(admin_tok: str) -> None:
+    """Storefront buyer account used for manual login, seed_checkout.py and k6.
+
+    Created here rather than relied upon from the realm import: the Keycloak
+    database is recreated whenever the namespace or its PVC is rebuilt, and the
+    import does not reliably restore this account. Without it, login fails with
+    `invalid_grant` and seed_checkout.py cannot authenticate.
+    """
+    ensure_user(admin_tok, TEST_USER, TEST_PW, "buyer", "Test", "User")
 
 
 def seed_user_token() -> str:
@@ -441,6 +474,7 @@ def main() -> None:
 
     admin_tok = kc_master_token()
     ensure_seed_user(admin_tok)
+    ensure_test_user(admin_tok)
     user_tok = seed_user_token()
     print()
 
