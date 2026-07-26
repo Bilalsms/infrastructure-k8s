@@ -28,6 +28,9 @@ resource "kubernetes_deployment" "misarch_experiment_executor" {
 
   spec {
     replicas = 1
+    strategy {
+      type = "Recreate"
+    }
 
     selector {
       match_labels = {
