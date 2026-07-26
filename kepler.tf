@@ -16,6 +16,25 @@ resource "helm_release" "kepler" {
     kubernetes_namespace.kepler,
     helm_release.prometheus_grafana_stack,
   ]
+
+  // CROSS-NAMESPACE OWNERSHIP HAZARD
+  //   This release lives in the `kepler` namespace but renders its
+  //   ServiceMonitor into `misarch` (see values below). Deleting the misarch
+  //   namespace therefore destroys the ServiceMonitor while leaving this
+  //   release "deployed" and healthy — so a plain `terraform apply` sees
+  //   nothing to do, Kepler keeps exporting metrics, and NOBODY SCRAPES THEM.
+  //   The failure is silent: pods are green, Prometheus simply has zero
+  //   kepler_container_joules_total and every energy dashboard is blank.
+  //
+  //   Replacing this release whenever the misarch namespace is recreated
+  //   re-renders the ServiceMonitor. Costs one DaemonSet restart on rebuild;
+  //   Kepler is stateless, so nothing is lost.
+  //
+  //   Verify after any rebuild:
+  //     kubectl get servicemonitor -n misarch | grep kepler
+  lifecycle {
+    replace_triggered_by = [kubernetes_namespace.misarch]
+  }
   name       = "kepler"
   repository = "https://sustainable-computing-io.github.io/kepler-helm-chart"
   chart      = "kepler"

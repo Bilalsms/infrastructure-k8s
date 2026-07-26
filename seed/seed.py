@@ -420,8 +420,20 @@ def do_reset() -> None:
 
 # ── main ────────────────────────────────────────────────────────────────────
 def main() -> None:
+    global KC_ADMIN_PW
     if not KC_ADMIN_PW:
-        sys.exit("KEYCLOAK_ADMIN_PASSWORD is required (master-realm admin password)")
+        # Fall back to the in-cluster bootstrap Secret, matching the behaviour
+        # of seed_checkout.py. Reuses _secret() defined above.
+        try:
+            KC_ADMIN_PW = _secret("keycloak-bootstrap", "KEYCLOAK_ADMIN_PASSWORD")
+            print("[seed] KEYCLOAK_ADMIN_PASSWORD loaded from k8s secret keycloak-bootstrap")
+        except Exception:
+            sys.exit(
+                "KEYCLOAK_ADMIN_PASSWORD is required (master-realm admin password).\n"
+                "  Could not read it from the cluster either. Set it explicitly:\n"
+                "    export KEYCLOAK_ADMIN_PASSWORD=$(kubectl -n misarch get secret "
+                "keycloak-bootstrap -o jsonpath='{.data.KEYCLOAK_ADMIN_PASSWORD}' | base64 -d)"
+            )
     print(f"keycloak: {KC_URL}")
     print(f"gateway:  {GW_URL}")
     print(f"realm:    {REALM}")
