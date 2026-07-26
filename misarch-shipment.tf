@@ -1,5 +1,5 @@
 resource "kubernetes_deployment" "misarch_shipment" {
-  depends_on = [helm_release.misarch_shipment_db, helm_release.dapr]
+  depends_on = [helm_release.misarch_pg_shared, helm_release.dapr]
   metadata {
 
     name      = local.misarch_shipment_service_name

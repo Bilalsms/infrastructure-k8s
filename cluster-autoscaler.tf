@@ -16,8 +16,7 @@
 //   cluster's CPU-allocation footprint dropped enough to fit on a single
 //   e2-standard-8 during S0 idle. With autoscaler min=1 max=2, GKE will drain
 //   one node when allocation drops below ~80 % of single-node capacity, then
-//   restore the second node under S2 peak. Expected idle-time win: ~50 W
-//   (entire VM goes off-billing).
+//   restore the second node under S2 peak.
 //
 // Verification: `gcloud container node-pools list --cluster=misarch
 //                --zone=europe-west1-b --format='value(autoscaling)'`

@@ -343,21 +343,52 @@ _TRUNCATE_PUBLIC = (
 )
 
 
-def truncate_postgres(label: str, statefulset_pod: str = None) -> None:
-    """Truncate all non-flyway tables in the named Bitnami Postgres pod.
+# Postgres consolidation: the 8 per-service Postgres releases were replaced by a
+# single `misarch-pg-shared` instance holding one logical DB per service. When
+# that layout is live, the per-service secrets/pods (`tax-db`, `tax-db-0`, …)
+# no longer exist, so reset must target the shared instance + `<svc>_db` DB.
+PG_SHARED_POD    = os.environ.get("PG_SHARED_POD",    "misarch-pg-shared-0")
+PG_SHARED_SECRET = os.environ.get("PG_SHARED_SECRET", "misarch-pg-shared")
+PG_SHARED_USER   = os.environ.get("MISARCH_DB_USER",  "misarch")
+_SHARED_DB = {
+    "address-db": "address_db", "catalog-db": "catalog_db",
+    "discount-db": "discount_db", "notification-db": "notification_db",
+    "return-db": "return_db", "shipment-db": "shipment_db",
+    "tax-db": "tax_db", "user-db": "user_db",
+}
 
-    `label` is both the secret name and the StatefulSet name in MiSArch's
-    convention (e.g. catalog-db, tax-db). Pod is `<label>-0` by default.
+
+def _secret_exists(name: str) -> bool:
+    try:
+        _kubectl("get", "secret", name, "-o", "name")
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+
+def truncate_postgres(label: str, statefulset_pod: str = None) -> None:
+    """Truncate all non-flyway tables for the given service DB.
+
+    Handles both layouts:
+      * per-service (vanilla): secret/pod/DB named after `label` (`tax-db`,
+        `tax-db-0`, database `misarch`).
+      * consolidated (path-3): shared `misarch-pg-shared-0` pod, secret
+        `misarch-pg-shared`, database `<svc>_db`.
+    Picks consolidated automatically when the per-service secret is gone.
     """
-    pod = statefulset_pod or f"{label}-0"
-    pw  = _secret(label, "password")
+    if label in _SHARED_DB and not _secret_exists(label):
+        pod, user = PG_SHARED_POD, PG_SHARED_USER
+        pw, db    = _secret(PG_SHARED_SECRET, "password"), _SHARED_DB[label]
+    else:
+        pod  = statefulset_pod or f"{label}-0"
+        pw, user, db = _secret(label, "password"), "misarch", "misarch"
     _kubectl(
         "exec", "-i", pod, "-c", "postgresql", "--",
         "bash", "-c",
-        f"PGPASSWORD='{pw}' psql -U misarch -d misarch -v ON_ERROR_STOP=1",
+        f"PGPASSWORD='{pw}' psql -U {user} -d {db} -v ON_ERROR_STOP=1",
         input_=_TRUNCATE_PUBLIC,
     )
-    print(f"{label}: truncated all public tables")
+    print(f"{label}: truncated all public tables (db={db}, pod={pod})")
 
 
 def empty_minio_bucket() -> None:
