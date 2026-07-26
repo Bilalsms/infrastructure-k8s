@@ -27,6 +27,16 @@ resource "kubernetes_deployment" "misarch_experiment_config" {
     namespace = local.namespace
   }
 
+  // KEDA owns replicas (see keda-scaledobjects.tf — minReplicaCount = 0).
+  // Without ignore_changes, every `terraform apply` resets replicas 0 -> 1 and
+  // silently reverts the A2 scale-to-zero refactor until KEDA's 300 s cooldown
+  // scales it back down. An apply immediately before a measurement run would
+  // therefore contaminate the S0 idle reading with a service that is supposed
+  // to be dark. Same ownership conflict as the HPA services (misarch-catalog.tf).
+  lifecycle {
+    ignore_changes = [spec[0].replicas]
+  }
+
   spec {
     replicas = 1
 

@@ -1,5 +1,21 @@
 # Misarch Kubernetes Infrastructure
 
+> ## ▶ Reproducing this deployment
+>
+> **[REPRODUCTION.md](REPRODUCTION.md) is the step-by-step guide** — start there.
+> It covers the full path from an empty GCP project to a working refactored
+> deployment producing the report's energy numbers: cluster creation, Terraform
+> bootstrap, self-signed certificate trust, Keycloak CORS, seeding, end-to-end
+> validation, the measurement runs, and every known issue with its fix.
+>
+> This README is the original upstream MiSArch reference (deployment approach,
+> repository structure, generic troubleshooting) and remains accurate, but it
+> predates the CNAE energy work and does **not** describe the refactored setup.
+>
+> **CNAE Project I — Energy Efficiency & Sustainability**
+> Syed Muhammad Bilal (520101) · TU Berlin, SoSe 2026
+
+
 ## Overview
 
 This repository contains the Terraform scripts responsible for orchestrating the deployment of the Misarch Platform on a Kubernetes cluster.
@@ -110,7 +126,15 @@ It is not intended for productive use in the slightest.
 
 ### Troubleshooting
 
-- **Disappearing Dapr Sidecars**: If Dapr sidecars disappear, causing communication to stop working in the cluster, try restarting the affected deployments.
+- **Disappearing Dapr Sidecars**: If Dapr sidecars disappear, causing communication to stop working in the cluster, try restarting the affected deployments. **This is the #1 time-sink after a mass restart (`terraform apply`, node drain, etc.):** the sidecar-injector silently skips `daprd` on some recreated pods. Symptoms are confusing and look like auth/TLS bugs:
+    - **Every authenticated GraphQL query fails with `Query.X requires authentication`** (but public queries work, and the frontend loads). The gateway verifies JWTs by fetching Keycloak's JWKS *through Dapr service-invocation* (`gateway/envelopPlugins.ts` → `http://localhost:3500/v1.0/invoke/keycloak/...`). If **Keycloak** is missing `daprd`, that call returns empty → no signing keys → all tokens rejected. It is **not** a TLS/cert problem — `NODE_TLS_REJECT_UNAUTHORIZED` is a red herring here.
+    - **Frontend / ingress returns 502** — the gateway's readiness probe fails while it can't verify, so the Service has no endpoints.
+    - **`uploadMedia: "error sending request"`** during seeding — the **media** pod is missing `daprd`.
+    - **Diagnose — list every pod that wants Dapr but has no `daprd` container:**
+      ```bash
+      kubectl -n misarch get pods -o json | python3 -c 'import sys,json;d=json.load(sys.stdin);print("\n".join(p["metadata"]["name"] for p in d["items"] if p["metadata"].get("annotations",{}).get("dapr.io/app-id") and "daprd" not in [c["name"] for c in p["spec"]["containers"]]) or "none missing")'
+      ```
+    - **Fix:** confirm `dapr-sidecar-injector` is `Running`, then `kubectl -n misarch rollout restart deploy/<each-flagged-deployment>` and re-run the check until it prints `none missing`. Restarting a pod re-triggers injection. (The `load-tests/run-pg-consolidation-n5.sh` runner now audits + auto-repairs this before and between sweeps.)
 - **Schema Changes in Services**: If there are schema changes in individual services without changes in the gateway code, a restart of the gateway deployment is required.
 - **\<x\> exists already**: When canceling a previous `terraform apply` and re-running `terraform apply`, this error can occur. It means that `terraform` sees state outside of its control. In this case, you have two options: `terraform refresh` may help sometimes. If it does not help, delete the component and try again. In the worst case, execute `kubectl delete namespaces misarch` (or whatever you named your namespace) and try again. We know it's weird, but it seems to be caused by Terraforms design.
 - **failed to fetch resource from kubernetes: the server could not find the requested resource**: There are multiple causes for this error, you need to find out which one is applicable for you:

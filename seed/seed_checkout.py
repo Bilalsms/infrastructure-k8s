@@ -109,11 +109,38 @@ def discover(token: str, keywords: list[str]) -> None:
 # Best-guess mutation names + payloads based on conventional MiSArch naming.
 # Run `discover` first to confirm. If a name differs, edit here and re-run `seed`.
 
-# Test user's Keycloak UUID — from cluster-state memory; verify with:
-#   curl ".../realms/Misarch/users?username=test" with an admin token
-TEST_USER_ID = os.environ.get(
-    "TEST_USER_ID", "e6be523c-67cf-4f89-ba3c-c4ce2349762a"
-)
+# Test user's Keycloak UUID.
+#
+# This MUST be looked up at runtime, not hardcoded: Keycloak mints a fresh UUID
+# for `test` every time its database is recreated (new cluster, or a
+# `kubectl delete namespace misarch`). A stale value makes the address mutation
+# fail with "User with id <uuid> does not exist" even though the user exists —
+# the address service correctly rejects an id it has never mirrored.
+#
+# Set TEST_USER_ID to override (e.g. to seed for a different user).
+def resolve_test_user_id() -> str:
+    override = os.environ.get("TEST_USER_ID")
+    if override:
+        print(f"[seed_checkout] TEST_USER_ID from env: {override}")
+        return override
+
+    admin_tok = kc_master_token()
+    r = http.get(
+        f"{KC_URL}/admin/realms/{REALM}/users",
+        params={"username": TEST_USER, "exact": "true"},
+        headers={"Authorization": f"Bearer {admin_tok}"},
+        timeout=30,
+    )
+    r.raise_for_status()
+    users = r.json()
+    if not users:
+        sys.exit(
+            f"Keycloak user {TEST_USER!r} not found in realm {REALM!r}.\n"
+            "  Run `python3 seed.py` first — it creates the test user."
+        )
+    uid = users[0]["id"]
+    print(f"[seed_checkout] resolved {TEST_USER!r} -> {uid}")
+    return uid
 
 M_SHIPMENT_METHOD_CREATE = """
 mutation CreateShipmentMethod($input: CreateShipmentMethodInput!) {
@@ -138,7 +165,7 @@ mutation CreateUserAddress($input: CreateUserAddressInput!) {
 #   python3 seed_checkout.py discover-types NameInput
 # Common shapes: {firstName, lastName} or {firstName, lastName, middleName}
 ADDRESS_INPUT = {
-    "userId":     TEST_USER_ID,
+    # "userId" is injected in seed() from resolve_test_user_id()
     # `name` (NameInput) is declared on the address subgraph but the federated
     # gateway schema doesn't expose it — Mesh skew. Skip; name lives on the user.
     "street1":    "Straße des 17. Juni 135",
@@ -198,6 +225,12 @@ def seed() -> None:
 
     test_tok = test_user_token()
     print(f"keycloak: signed in as {TEST_USER}")
+
+    # Resolve the test user's *current* Keycloak UUID (see resolve_test_user_id).
+    test_user_id = resolve_test_user_id()
+    ADDRESS_INPUT["userId"] = test_user_id
+    if "userId" in PAYMENT_INFO_INPUT:
+        PAYMENT_INFO_INPUT["userId"] = test_user_id
 
     # 1. shipment method — admin token required (test user is buyer-only)
     admin_tok = _admin_user_token()

@@ -1,0 +1,25 @@
+# Python dependencies for the MiSArch seed scripts
+# (seed.py, seed_checkout.py, sync_mirrors.py)
+#
+# Setup:
+#   cd misarch/infrastructure-k8s/seed
+#   python3 -m venv .venv
+#   . .venv/bin/activate
+#   pip install -r requirements.txt
+#
+# Verified against Python 3.14.5. Anything >= 3.9 should work; the scripts use
+# only stdlib features plus `requests`.
+#
+# `requests` is the sole direct dependency — everything else below is its
+# transitive closure, pinned so a reproduction run resolves identical versions.
+# The scripts reach the cluster over plain HTTP through seed/portforward.sh
+# (localhost:8080 gateway, localhost:8081 keycloak), so no TLS/CA configuration
+# is required here even though the public ingress uses a self-signed cert.
+
+requests==2.34.2
+
+# --- transitive (pinned for reproducibility) ---
+certifi==2026.6.17
+charset-normalizer==3.4.7
+idna==3.18
+urllib3==2.7.0
