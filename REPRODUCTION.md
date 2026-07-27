@@ -17,9 +17,12 @@
 | `infrastructure-k8s` | https://github.com/Bilalsms/infrastructure-k8s | Terraform for all in-cluster resources, seed scripts, dashboards. **Start here.** |
 | `gateway` | https://github.com/Bilalsms/gateway | Gateway-Optimized source: JWT-verification cache, HTTP-only OTel, playground off |
 | `inventory` | https://github.com/Bilalsms/inventory | `pubSubName` Dapr subscription fix |
+| `misarch-load-tests` | https://github.com/Bilalsms/misarch-load-tests | k6 workloads (S0/S1/S2), `mint-token.sh`, `run-baseline.sh`, raw Kepler exports & aggregation/plotting scripts. Clone as `../load-tests`. |
 | **Reproduction video** | https://drive.google.com/file/d/14Z8roAfmdfW_6zp84egBu9BeDZWKFpEH/view?usp=share_link | Screen recording of the full deployment, a working checkout scenario, and the refactor with its energy measurement |
 
-Each repo carries a `vanilla` branch (baseline) and `main` (refactored).
+The `infrastructure-k8s` and `gateway` code repos each carry a `vanilla` branch (baseline) and `main`
+(refactored); `inventory` only contains the pubSubName fix for Dapr and `misarch-load-tests` holds data and workloads, not a deployable
+system, so it is single-branch.
 
 ## Branches
 

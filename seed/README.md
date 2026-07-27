@@ -5,6 +5,22 @@ the GraphQL gateway (`api.misarch.<reserved-ip>.nip.io`) and Keycloak
 (`auth.misarch.<reserved-ip>.nip.io`), using `portforward.sh` for local runs
 or the public ingress in CI.
 
+## Setup (run first)
+
+Create a virtualenv and install the pinned dependencies from
+[`requirements.txt`](./requirements.txt) before running any script below (the
+scripts' only third-party dependency is `requests`; the file pins its
+transitive closure so a reproduction resolves identical versions):
+
+```
+cd seed
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Then start the port-forwards in a separate terminal (`./portforward.sh`) so the
+scripts can reach the gateway and Keycloak locally.
+
 ## `seed.py` — catalog + tax (upstream)
 
 Vendor seeder. Wipes and re-creates the product catalog, tax rates and MinIO
